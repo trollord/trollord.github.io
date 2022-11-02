@@ -1,155 +1,118 @@
-data = [
-['T100',['Bread','Butter','Chips']],
-['T200',['Butter','Milk']],
-['T300',['Butter','Cheese']],
-['T400',['Bread','Butter','Milk']],
-['T500',['Bread','Cheese']],
-['T600',['Butter','Cheese']],
-['T700',['Bread','Cheese']],
-['T800',['Bread','Butter','Cheese','Chips']],
-['T900',['Bread','Butter','Cheese']],
-]
+import pandas as pd
+import numpy as np
+import itertools
+dataset = pd.read_csv('data.csv',header=None)
+transactions = []
+for i in range(0,len(dataset)):
+  transactions.append({str(dataset.values[i,j])
+  for j in range(0,len(dataset.columns)):
+    if str(dataset.values[i,j]) != 'nan'})
+      print('Transactions:\n')
+for transaction in transactions:
+print(transaction)
 
-init = []
+def init_candidates(transactions):
+  candidates = dict()
 
-for i in data:
-    for q in i[1]:
-        if(q not in init):
-            init.append(q)
-init = sorted(init)
-print(init)
+  for transaction in transactions:
+    for item in transaction:
+      itemset = set() itemset.add(item)
+      itemset = frozenset(itemset)
+  if itemset not in candidates:
+    candidates[itemset] = 1
+  else:
+    candidates[itemset] += 1
+return candidates
 
-sp = 0.5
-s = int(sp*len(init))
+def prune_candidates(candidates,support):
+  fp =dict()
+  for key in candidates:
+    if candidates[key] >= support:
+      fp[key] = candidates[key]
+  return fp
 
-from collections import Counter
+def get_count(transactions,itemset):
+  itemset = set(itemset) count = 0 
+  for transaction in transactions:
+    if itemset.issubset(transaction):
+      count+= 1
+  return count
 
-c = Counter()
-for i in init:
-    for d in data:
-        if(i in d[1]):
-            c[i]+=1
+def get_candidates(fp,transactions,fp_length):
+  candidates = dict()
+  for key1 in fp: 
+    for key2 in fp:
+      if key2 != key1: 
+        itemset1 = set(key1)
+        itemset2 =set(key2)
+        itemset = itemset1.union(itemset2)
+        itemset = frozenset(itemset)
+  if itemset not in candidates and len(itemset) == fp_length:
+    candidates[itemset] = get_count(transactions,itemset)
+  return candidates
 
-print("C1:")
-for i in c:
-    print(str([i])+": "+str(c[i]))
-print()
+def get_itemset_length(candidates):
+  itemset_len = 0
+  for key in candidates:
+    itemset_len = len(key)break
+  return itemset_lendef
+get_rules(fp):
+  rules = []
+  for itemset in fp:
+    itemset =set(itemset)
+    for length in range(1,len(itemset)):
+      subsets = set(itertools.combinations(itemset, length))
+      for subset in subsets:
+        lhs = set(subset)
+        rhs = itemset.difference(lhs) 
+        rules.append([lhs,rhs])
+  return rules
 
-l = Counter()
-for i in c:
-    if(c[i] >= s):
-        l[frozenset([i])]+=c[i]
-print("L1:")
-for i in l:
-    print(str(list(i))+": "+str(l[i]))
-print()
+def prune_rules(rules,confidence,transactions):
+  fp = []
+for rule in rules:
+  lhs = rule[0]
+  rhs = rule[1]
+  lhs_rhs = lhs.union(rhs)
+  lhs_count = get_count(transactions,lhs)
+  lhs_rhs_count = get_count(transactions,lhs_rhs)
+  conf  = lhs_rhs_count/lhs_count
+  if conf >= confidence:
+    support = lhs_rhs_count/len(transactions)
+    fp.append([lhs,rhs,support,conf])
+  return fp
 
-pl = l
-pos = 1
-
-for count in range (2,1000):
-    nc = set()
-    temp = list(l)
-    for i in range(0,len(temp)):
-        for j in range(i+1,len(temp)):
-            t = temp[i].union(temp[j])
-            if(len(t) == count):
-                nc.add(temp[i].union(temp[j]))
-
-    nc = list(nc)
-    c = Counter()
-
-    for i in nc:
-        c[i] = 0
-        for q in data:
-            temp = set(q[1])
-            if(i.issubset(temp)):
-                c[i]+=1
-
-    print("C"+str(count)+":")
-
-    for i in c:
-        print(str(list(i))+": "+str(c[i]))
+def display(candidates,fp,length):
+  print()
+  print("****** {}-Frequent Candidates ******".format(length))
+  for  key in candidates:
+    print(set(key),' : ',candidates[key])
     print()
-
-    l = Counter()
-
-    for i in c:
-        if(c[i] >= s):
-            l[i]+=c[i]
-
-    print("L"+str(count)+":")
-
-    for i in l:
-        print(str(list(i))+": "+str(l[i]))
-    print()
-
-    if(len(l) == 0):
-        break
-    pl = l
-    pos = count
-
-print("Result: ")
-print("L"+str(pos)+":")
-
-for i in pl:
-    print(str(list(i))+": "+str(pl[i]))
-print()
-
-from itertools import combinations
-
-for l in pl:
-    c = [frozenset(q) for q in combinations(l,len(l)-1)]
-    mmax = 0
-
-    for a in c:
-        b = l-a
-        ab = l
-        sab = 0
-        sa = 0
-        sb = 0
-        for q in data:
-            temp = set(q[1])
-            if(a.issubset(temp)):
-                sa+=1
-            if(b.issubset(temp)):
-                sb+=1
-            if(ab.issubset(temp)):
-                sab+=1
-        temp = sab/sa*100
-        if(temp > mmax):
-            mmax = temp
-        temp = sab/sb*100
-        if(temp > mmax):
-            mmax = temp
-        print(str(list(a))+" -> "+str(list(b))+" = "+str(sab/sa*100)+"%")
-        print(str(list(b))+" -> "+str(list(a))+" = "+str(sab/sb*100)+"%")
-
-    curr = 1
-    print("choosing:", end=' ')
-
-    for a in c:
-        b = l-a
-        ab = l
-        sab = 0
-        sa = 0
-        sb = 0
-        for q in data:
-            temp = set(q[1])
-            if(a.issubset(temp)):
-                sa+=1
-            if(b.issubset(temp)):
-                sb+=1
-            if(ab.issubset(temp)):
-                sab+=1
-        temp = sab/sa*100
-        if(temp == mmax):
-            print(curr, end = ' ')
-        curr += 1
-        temp = sab/sb*100
-        if(temp == mmax):
-            print(curr, end = ' ')
-        curr += 1
-
-    print()
-    print()
+  print("****** {}-Frequent Itemlist ******".format(length))
+  for key in fp:
+    print(set(key),' : ',fp[key])
+    
+def apriori(transactions,support,confidence):
+  support = support/100 * len(transactions)
+  confidence = confidence/100
+  candidates = init_candidates(transactions) 
+  old_fp= prune_candidates(candidates,support)
+  final_fp = dict() display(candidates,old_fp,1)
+  while True:
+    new_fp_length = get_itemset_length(candidates) + 1
+    candidates = get_candidates(old_fp,transactions,new_fp_length)
+    new_fp = prune_candidates(candidates,support)
+    display(candidates,new_fp,new_fp_length)
+    if len(new_fp)<1:
+      final_fp = old_fpbreak
+    else:
+      old_fp = new_fp
+      rules = get_rules(final_fp)
+      fp = prune_rules(rules,confidence,transactions)
+  return fp
+support = float(input('Enter support percentage : ')) 
+confidence= float(input('Enter confidence percentage : '))
+fp =apriori(transactions,support,confidence)
+results = pd.DataFrame(columns=['LHS','RHS','Support','Confidence'])
+for rule in fp:
+  results.loc[len(results.index)] = rule print(results)
