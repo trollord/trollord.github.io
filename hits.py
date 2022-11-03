@@ -1,42 +1,39 @@
-import numpy as num
+n = int(input("Enter the number of edges:\n"))
 
-graph = {
-    'b' : ['a','c','d', 'e'],
-    'a' : ['d', 'c'],
-    'c' : ['d','b', 'e'],
-    'd' : ['b','c'],
-    'e' : ['b','c','d']
-}
-iterationNo = 7
+print(f"Enter the {n} edges:\n")
+nodes = [np.int0(np.zeros(2)) for _ in range(n)]
+for x in range(0,n):
+    print(f"Enter nodes of edge {x+1}")
+    for y in range(0,2):
+        nodes[x][y] = int(input())
+    print()
 
-print("Graph")
-print(graph)
 
-# print(graph['b'].count('a'))
+nodes = np.array(nodes)
+adjacency_matrix = np.zeros((np.max(nodes)+1, np.max(nodes)+1))
+for s, e in nodes:
+    print(f"{s},{e}")
+    adjacency_matrix[s][e] = 1
+    print(adjacency_matrix)
 
-A = []
+hits = np.ones((np.max(nodes)+1,))
+authorities = np.ones((np.max(nodes)+1,))
 
-for i in graph.keys():
-    a = []
-    for j in graph.keys():
-        if(graph[j].count(i)!=0):
-            a.append(1/len(graph[j]))
-        else:
-            a.append(0)
-    A.append(a)
-print("Page rank Matrix")
-for i in A:
-    for j in i:
-        print(j,' ',end=" "),
-    print('')
+print(f"The adjacency matrix is:\n{adjacency_matrix}\n")
 
-B = []
+max_itr = 10
+for _ in range(max_itr):
+    hits = adjacency_matrix @ authorities
+    authorities = adjacency_matrix.T @ hits
+    """
+        @ ka matlab dot prodcut
+        hits = np.dot(adjacency_matrix,authorities)
+    """
+    # normalize
+    hits = hits / np.linalg.norm(hits)
+    authorities = authorities / np.linalg.norm(authorities)
 
-for i in range(0,len(A)):
-    B.append([1])
-print("Iteration Table")
-print(B)
-
-for i in range(0,iterationNo):
-    B = num.matmul(A,B)
-    print(B)
+print("Hits: ", dict(enumerate(hits)))
+print()
+print("Authorities: ", dict(enumerate(authorities)))
+print() 
