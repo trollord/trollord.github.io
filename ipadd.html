@@ -9,206 +9,76 @@
 <body>
     <pre>
 import math
-def findClass(ip): 
-if 0 <= ip[0] <= 127: 
-print("Network Address is : ", ip[0])
-print('No. of IP addresses possible : ', 2 ** 24)
-return "A",'255.0.0.0'
-elif 128 <= ip[0] <= 191: 
-ip = [str(i) for i in ip]
-print("Network Address is : ", ".".join(ip[0:2])) 
-print('No. of IP addresses possible : ', 2 ** 16) 
-return "B", '255.255.0.0'
-elif 192 <= ip[0] <= 223: 
-ip = [str(i) for i in ip] 
-print("Network Id is : ", ".".join(ip[0:3])) 
-print('No. of IP addresses possible : ', 2 ** 8) 
-return "C", '255.255.255.0'
-elif 224 <= ip[0] <= 239: 
-print("In this Class, IP address is not divided into Network and Host 
-ID") 
-return "D"
-else: 
-print("In this Class, IP address is not divided into Network and Host 
-ID") 
-return "E"
-def Subnetting(ip, num, className, ip_addresses): 
-temp = 0
-if className == "A": 
-place2 = ip_addresses / (256 ** 2) 
-for i in range(num): 
-print(f"Subnet {i} => ") 
-print(temp) 
-print("Subnet Address : ", ip[0] + '.' + str(temp) + '.0' + '.0') 
-temp += int(place2) 
-print("Broadcast address : ", ip[0] + '.' + str(temp - 1) + '.255'
-+ '.255') 
-print("Valid range of host IP address : ", ip[0] + '.' + str(temp
-- int(place2)) + '.' + '0' + '.1' + '\t-\t' + ip[0] + '.' + str( temp - 1) + 
-'.254' + '.254') 
-print() 
-elif className == "B": 
-place2 = ip_addresses / 256
-for i in range(num): 
-print(f"\nSubnet {i} => ") 
-print("Subnet Address : ", ".".join(ip[0:2]) + '.' + str(temp) + 
-'.0') 
-temp += int(place2) 
-print("Broadcast address : ", ".".join(ip[0:2]) + '.' + str(temp -
-1) + '.255') 
-print("Valid range of host IP address : ",".".join(ip[0:2]) + '.'
-+ str(temp - int(place2)) + '.1\t-\t' + ".".join(ip[0:2]) + '.' + str( temp -
-1) + '.254') 
-print() 
-elif className == "C": 
-for i in range(num): 
-print(f"\nSubnet {i} => ") 
-print("Subnet Address : ", ".".join(ip[0:3]) + '.' + str(temp)) 
-temp += int(ip_addresses) 
-print("Broadcast address : ", ".".join(ip[0:3]) + '.' + str(temp -
-1)) 
-print("Valid range of host IP address : ", ".".join(ip[0:3]) + '.'
-+ str(temp - int(ip_addresses) + 1) + '\t-\t' + ".".join(ip[0:3]) + '.' + str( 
-temp - 2)) 
-print() 
-else: 
-print("In this Class, IP address is not divided into Network and 
-Host ID") 
-def subnetmask(num, network_mask): 
-var = '1' * int(math.log(num, 2)) 
-var1 = '0' * (8 -int(math.log(num, 2))) 
-binary_num = var + var1
-network_mask = network_mask.split('.') 
-network_mask = [i for i in network_mask if i != '0'] 
-network_mask.append(str(int(binary_num, 2))) 
-while len(network_mask) < 5: 
-network_mask.append('0') 
-print('Subnet Mask – ', ".".join(network_mask[0:4])) 
-ip = input("Enter the IP address : ") 
-ip = ip.split(".") 
-ip = [int(i) for i in ip] 
-lst = findClass(ip) 
-networkClass = lst[0] 
-print("Given IP address belongs to class : ", networkClass) 
-ip = [str(i) for i in ip] 
-network_mask = lst[1] 
-print('Network Mask : ', network_mask) 
-num_subnet = int(input('\nNo. of subnets(power of 2) : ')) 
-num_ip = int(2 ** (8 * (68 - ord(networkClass))) / num_subnet) 
-print('The no. of bits in the subnet id : ', int(math.log(num_subnet, 2))) 
-if ord(networkClass) < 68: 
-print('Total no. of IP addresses possible in each subnet : ', num_ip) 
-Subnetting(ip, num_subnet, networkClass, num_ip) 
-subnetmask(num_subnet, network_mask)
+
+def AND(ip, mask):
+    return [x & y for x,y in zip(ip, mask)]
+
+
+def printIP(ip):
+    print(f"{ip[0]}.{ip[1]}.{ip[2]}.{ip[3]}")
+
+
+def ADD(ip, number):
+    stringip = ip[0]*(2**24)+ip[1]*(2**16)+ip[2]*(2**8)+ip[3]
+    stringip += number
+    return [(stringip >> 24) & 0xFF, (stringip >> 16) & 0xFF, (stringip >> 8) & 0xFF, (stringip) & 0xFF]
+
+ip = input("Enter the ip address : ")
+bytes = [int(x) for x in ip.split(".")]
+if bytes[0] < 128:
+    ipclass = 'A'
+elif bytes[0] < 192:
+    ipclass = 'B'
+elif bytes[0] < 224:
+    ipclass = 'C'
+elif bytes[0] < 240:
+    ipclass = 'D'
+else:
+    ipclass = 'E'
+
+print("Class =", ipclass)
+if ipclass == 'A':
+    ipbits = 24
+    mask=[255, 0, 0, 0]
+elif ipclass == 'B':
+    ipbits = 16
+    mask=[255, 255, 0, 0]
+elif ipclass == 'C':
+    ipbits = 8
+    mask=[255, 255, 255, 0]
+
+print("Mask : ", end='')
+printIP(mask)
+netID = AND(bytes, mask)
+print("Net ID : ", end='')
+printIP(netID)
+print("Number of possible IP addresses =", 2**ipbits)
+
+n = int(input("Enter number of subnets (power of 2): "))
+print("Number of bits in subnet ID : ", int(math.log2(n)))
+subnet_count = 2**ipbits // n
+print("IP addresses in each subnet : ", subnet_count)
+subnetID = netID
+for i in range(n):
+    print()
+    print("Subnet", i)
+    print("Subnet ID : ", end='')
+    printIP(subnetID)
+    print("From : ", end='')
+    printIP(ADD(subnetID, 1))
+    print("To : ", end='')
+    printIP(ADD(subnetID, subnet_count-2))
+    print("Broadcast add : ", end='')
+    printIP(ADD(subnetID, subnet_count-1))
+    subnetID = ADD(subnetID, subnet_count)
+
+stringmask = mask[0]*(2**24)+mask[1]*(2**16)+mask[2]*(2**8)+mask[3]
+stringmask += (2**(int(math.log2(n)))-1) << (ipbits-int(math.log2(n)))  # Add required number of 1 bits to the mask
+print("Subnet mask : ", end='')
+printIP([(stringmask >> 24) & 0xFF, (stringmask >> 16) & 0xFF, (stringmask >> 8) & 0xFF, (stringmask) & 0xFF])
     </pre>
     
     
-    <pre>
     
-    import java.util.*;
-
-public class ipv4{
-    public static void main(String[] args){
-        Scanner in = new Scanner(System.in);
-
-        System.out.println("Enter the ipv4 address");
-        String ip = in.next();
-        String Broadcastaddress = "";
-        String Networkadd="";
-        char idc='n';
-        String ip1[] = ip.split("\\.");
-        int first = Integer.valueOf(ip1[0]);
-        if(first > 0  && first < 127){
-            System.out.println("Class A");
-            Broadcastaddress = ip1[0]+".255.255.255";
-            Networkadd = ip1[0]+".0.0.0";
-            idc = 'A';
-        }
-        else if(first > 127  && first < 191){
-            System.out.println("Class B");
-            Broadcastaddress = ip1[0]+"."+ip1[1]+".255.255";
-            Networkadd = ip1[0]+"."+ip1[1]+".0.0";
-            idc = 'B';
-        }
-        else if(first > 191  && first < 223){
-            System.out.println("Class C");
-            Broadcastaddress = ip1[0]+"."+ip1[1]+"."+ip1[2]+".255";
-            Networkadd = ip1[0]+"."+ip1[1]+"."+ip1[2]+".0";
-            idc = 'C';
-        
-        }
-        else if(first > 223  && first < 239){
-            System.out.println("Class D");
-            idc = 'D';
-        }
-        else if(first > 239  && first < 255){
-            System.out.println("Class E");
-            idc = 'E';
-        }
-        else{
-            System.out.println("Invalid");
-
-        }
-
-        System.out.println("Broadcast address is "+Broadcastaddress);
-        System.out.println("Network address is "+Networkadd);
-
-
-        System.out.println("Enter the no of subnets");
-        int n = in.nextInt();
-        int subnet_inc = 256/n;
-        int subnet_range[][] = new int[n][2];
-        
-
-        for(int i = 0; i < n; i++){
-            // subnet_range[i][0] = subnet_inc*i;
-            // subnet_range[i][1] = subnet_inc*(i+1)-1;
-            // System.out.println("Subnet "+(i+1)+" range is "+subnet_range[i][0]+" to "+subnet_range[i][1]);
-            if(idc== 'A'){
-               
-                subnet_range[i][0] = subnet_inc*i;
-                subnet_range[i][1] = subnet_inc*(i+1)-1;
-                
-                System.out.println("subnet address is "+ip1[0]+"."+subnet_range[i][0]+".0.0");
-                System.out.println("Broadcast address is "+ip1[0]+"."+subnet_range[i][1]+".255.255");
-
-                //print full address
-                System.out.println("Subnet "+(i+1)+" range is "+ip1[0]+"."+subnet_range[i][0]+"."+0+"."+0+" to "+ip1[0]+"."+subnet_range[i][1]+"."+255+"."+255);
-                System.out.println("==========================");
-            }
-            else if(idc == 'B'){
-                subnet_range[i][0] = subnet_inc*i;
-                subnet_range[i][1] = subnet_inc*(i+1)-1;
-              
-                System.out.println("subnet address is "+ip1[0]+"."+ip1[1]+"."+subnet_range[i][0]+".0");
-                System.out.println("Broadcast address is "+ip1[0]+"."+ip1[1]+"."+subnet_range[i][1]+".255");
-                //print full address
-                System.out.println("Subnet "+(i+1)+" range is "+ip1[0]+"."+ip1[1]+"."+subnet_range[i][0]+"."+0+" to "+ip1[0]+"."+ip1[1]+"."+subnet_range[i][1]+"."+255);
-                System.out.println("==========================");
-            }
-            else if(idc =='C'){
-                subnet_range[i][0] = subnet_inc*i;
-                subnet_range[i][1] = subnet_inc*(i+1)-1;
-
-                System.out.println("subnet address is "+ip1[0]+"."+ip1[1]+"."+ip1[2]+"."+subnet_range[i][0]);
-                System.out.println("Broadcast address is "+ip1[0]+"."+ip1[1]+"."+ip1[2]+"."+subnet_range[i][1]);
-
-            
-                //print full address
-                System.out.println("Subnet "+(i+1)+" range is "+ip1[0]+"."+ip1[1]+"."+ip1[3]+"."+subnet_range[i][0]+" to "+ip1[0]+"."+ip1[1]+"."+ip1[3]+"."+subnet_range[i][1]);
-                System.out.println("==========================");
-            }
-            else{
-                System.out.println("Invalid");
-            }
-
-        }
-        
-    }
-}
-    
-    
-    
-    </pre>
 </body>
 </html>
