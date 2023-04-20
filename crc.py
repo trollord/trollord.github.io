@@ -17,7 +17,7 @@ def CRC(dataword, generator):
 	generator = int(generator, 2)
 
 	while dividend >= generator or shft >= 0:
-
+		lmaoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 		# bitwise XOR the MSBs of dividend with generator
 		# replace the operated MSBs from the dividend with
 		# remainder generated
