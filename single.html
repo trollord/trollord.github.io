@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMMING</title>
+</head>
+
+<body>
+
+    <pre>
+
+    with open("macro.txt", "r") as input_file:
+    lines = [line.replace("\n", "") for line in input_file]
+
+MDT = []
+MNT = {}
+
+macro_line_count = 0
+
+def add_macro(data: list[str]):
+    global MNT, MDT, macro_line_count
+    data = data[1:]
+    definition_line = data[0]
+    tokens = definition_line.split()
+
+    for token in tokens:
+        if "&" not in token:
+            macro_name = token
+            break
+ 
+    MNT[macro_name] = macro_line_count
+
+    for line in data:
+        MDT.append(line)
+        macro_line_count += 1
+
+macro_start = False
+macro_buffer = []
+
+for line in lines:
+    if "MACRO" in line or macro_start:
+        macro_start=True
+        macro_buffer.append(line)
+
+        if "MEND" in line:
+            macro_start = False
+            add_macro(macro_buffer)
+            macro_buffer = []
+
+print(MNT)
+MDT
+
+</pre>
+</body>
+
+</html>
