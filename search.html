@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMMING</title>
+</head>
+
+<body>
+
+    <pre>
+        visited =[]
+        queue = []   
+        def bfs(visited, node , final):
+            visited.extend(node)
+            queue.extend(node)
+        
+            while queue:
+                print(queue)
+                m = queue.pop(0)
+        
+                for i in graph[m]:
+                    print(i)
+                    if i not in visited:
+                        visited.append(i)
+                        queue.append(i)
+                        if i == final:
+                            return True
+            return False
+        
+        print(bfs(visited, '5', '8'))
+        
+        for i in visited:
+            print(i, end = "->")
+
+
+-----------------------------------------------------
+
+graph  = {
+    '5' : ['3', '7'],
+    '3' : ['2', '4'],
+    '7' : ['8'],
+    '2' : [],
+    '4' : ['8'],
+    '8' : []
+}
+visited =[]
+
+
+def dfsp(visited):
+    for i in visited:
+        print(i,'->',end='')
+
+
+def dfs(visited, node, final):
+    if node not in visited:
+        visited.extend(node)
+        print(node , ' final ', final)
+        if node == final:
+            print('found')
+            return visited
+        for i in graph[node]:
+            dfs(visited, i, final)
+dfs(visited, '5', '7')
+dfsp(visited)
+
+</pre>
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMMING</title>
+</head>
+
+<body>
+
+    <pre>
+    hill = [[12, 15, 10, 7, 14, 16],
+        [13, 18, 13, 20, 5, 23],
+        [17, 9, 23, 24, 19, 2],
+        [7, 14, 16, 12, 34, 10],
+        [20, 5, 23, 13, 18, 13],
+        [24, 19, 2, 17, 9, 23]]
+path = []
+
+
+def hillclimbing(ix, iy):
+    x = ix
+    y = iy
+    # j=0
+    # for i in range(len(hill)):
+    #     if i > ix and j:
+    #         if i>0 and i< (len(hill)-1):
+    #             for j in range(len(hill[i])):
+    #                 if j > iy:
+    #                     if j >0 and j<(len(hill)-1):
+    #                         print(hill[i][j])
+    initial = hill[x][y]
+    print(initial)
+    i = ix
+    j = iy
+    pre = -1
+    path.append(initial)
+    while pre != initial:
+
+        if i == 0 and j == iy or i > 0:
+            print('check1', hill[i][j])
+            pre = initial
+
+            try:
+                if hill[i-1][j] > initial and i-1 >= 0:
+
+                    initial = hill[i-1][j]
+                    print('h[-1][0]', hill[i-1][j])
+                    i = i-1
+                    path.append(initial)
+
+            except:
+                pass
+            try:
+                if hill[i][j-1] > initial and j-1 >= 0:
+                    initial = hill[i][j-1]
+                    print('h[0][-1]', hill[i][j-1])
+                    j = j-1
+                    path.append(initial)
+
+            except:
+                pass
+            try:
+                if hill[i+1][j] > initial and i+1 < len(hill):
+                    initial = hill[i+1][j]
+                    print('h[+1][0]', hill[i+1][j])
+                    i = i+1
+                    path.append(initial)
+
+            except:
+                pass
+            try:
+                if hill[i][j+1] > initial and j+1 < len(hill[i]):
+                    initial = hill[i][j+1]
+                    print('h[0][+1]', hill[i][j+1])
+                    j = j+1
+                    path.append(initial)
+
+            except:
+                pass
+            try:
+                if hill[i-1][j-1] > initial and i-1 >= 0 and j-1 >= 0:
+                    initial = hill[i-1][j-1]
+                    print('h[-1][-1]', hill[i-1][j-1])
+                    i = i-1
+                    j = j-1
+                    path.append(initial)
+
+            except:
+                pass
+            try:
+                if hill[i+1][j+1] > initial and i+1 < len(hill) and j+1 < len(hill[i]):
+                    initial = hill[i+1][j+1]
+                    print('h[+1][+1]', hill[i+1][j+1])
+                    i = i+1
+                    j = j+1
+                    path.append(initial)
+
+            except:
+                pass
+
+
+hillclimbing(0, 2)
+
+print(path)
+
+</pre>
+</body>
+
+</html>
