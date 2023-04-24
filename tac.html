@@ -5,59 +5,59 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAMMING</title>
+    <title>tac</title>
 </head>
 
 <body>
 
     <pre>
 
-        import re 
-        expression = "a+b*-cdd/k"
-        
-        char = "[A-Za-z]"
-        id = "[A-Za-z][A-Za-z0-1]*"
-        
-        bodmas = ["/", "*", "+", "-"]
-        bodmas.reverse()
-        
-        tac = []
-        
-        for i, item in enumerate(re.findall("-[A-Ba-z]+", expression)):
-            tac.append(f"t{i} = {item}")
-            expression = expression.replace(item, f"t{i}")
-        
-        count = i+1
-        tac, expression
-        
-        def split(exp, op):
-            exp = exp.split(op)
-            return exp[0], "".join(exp[1:])
-        
-        def TAC(exp):
-            global count
-            for op in bodmas:
-                if op in exp:
-                    left, right = split(exp, op)
-        
-                    if not re.fullmatch(id, left):
-                        left_op = TAC(left)
-                    else:
-                        left_op = left
-                        
-                    if not re.fullmatch(id, right):
-                        right_op = TAC(right)
-                    else:
-                        right_op = right
-        
-                    tac.append(f"t{count}={left_op}{op}{right_op}")
-                    count += 1
-                    break
-        
-            return f"t{count-1}"
-        
-        final_op = TAC(expression)
-        tac, final_op
+import re 
+expression = "a+b*-cdd/k"
+
+char = "[A-Za-z]"
+id = "[A-Za-z][A-Za-z0-1]*"
+
+bodmas = ["/", "*", "+", "-"]
+bodmas.reverse()
+
+tac = []
+
+for i, item in enumerate(re.findall("-[A-Ba-z]+", expression)):
+    tac.append(f"t{i} = {item}")
+    expression = expression.replace(item, f"t{i}")
+
+count = i+1
+tac, expression
+
+def split(exp, op):
+    exp = exp.split(op)
+    return exp[0], "".join(exp[1:])
+
+def TAC(exp):
+    global count
+    for op in bodmas:
+        if op in exp:
+            left, right = split(exp, op)
+
+            if not re.fullmatch(id, left):
+                left_op = TAC(left)
+            else:
+                left_op = left
+                
+            if not re.fullmatch(id, right):
+                right_op = TAC(right)
+            else:
+                right_op = right
+
+            tac.append(f"t{count}={left_op}{op}{right_op}")
+            count += 1
+            break
+
+    return f"t{count-1}"
+
+final_op = TAC(expression)
+tac, final_op
 
 </pre>
 </body>

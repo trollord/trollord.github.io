@@ -5,42 +5,42 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAMMING</title>
+    <title>Left Recursion</title>
 </head>
 
 <body>
 
     <pre>
 
-        import re
+import re
 
-        grammar = ["A -> Aab|Akl|bkl", "B -> Bdd|dsk|dsa"]
-        
-        def remove_left_recursion(production):
-            left, right = production.split(" -> ")
-        
-            alphas = []
-            betas = []
-        
-            for item in right.split("|"):
-                if re.fullmatch(f"{left}\S+", item):
-                    alpha = item[1:]
-                    alphas.append(alpha)
-                else:
-                    betas.append(item)
-        
-            betas = " | ".join(list(map(lambda x: x+left, betas)))
-            alphas = " | ".join(list(map(lambda x: x+left+"'", alphas)) + ["e"])
-        
-            return [f"{left} -> {betas}", f"{left}' -> {alphas}"]
-        
-        new_grammar = []
-        
-        for prod in grammar:
-            new_grammar.extend(remove_left_recursion(prod))
-        
-        for item in new_grammar:
-            print(item)
+grammar = ["A -> Aab|Akl|bkl", "B -> Bdd|dsk|dsa"]
+
+def remove_left_recursion(production):
+    left, right = production.split(" -> ")
+
+    alphas = []
+    betas = []
+
+    for item in right.split("|"):
+        if re.fullmatch(f"{left}\S+", item):
+            alpha = item[1:]
+            alphas.append(alpha)
+        else:
+            betas.append(item)
+
+    betas = " | ".join(list(map(lambda x: x+left, betas)))
+    alphas = " | ".join(list(map(lambda x: x+left+"'", alphas)) + ["e"])
+
+    return [f"{left} -> {betas}", f"{left}' -> {alphas}"]
+
+new_grammar = []
+
+for prod in grammar:
+    new_grammar.extend(remove_left_recursion(prod))
+
+for item in new_grammar:
+    print(item)
 
 </pre>
 </body>

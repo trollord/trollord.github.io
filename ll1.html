@@ -5,138 +5,138 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAMMING</title>
+    <title>ll1</title>
 </head>
 
 <body>
 
     <pre>
 
-        # E  -> TE’
-        # E’ -> +T E’|Є
-        # T  -> F T’
-        # T’ -> *F T’ | Є
-        # F  -> (E) | id
-        
-        # E' = A
-        # T' = B
-        # id = i
-        
-        grammar = {
-            "E": ["TA"],
-            "A": ["+TA", "e"],
-            "T": ["FB"],
-            "B": ["*FB", "e"],
-            "F": ["(E)","i"]
-        }
-        
-        non_terminals = list(grammar.keys())
-        
-        terminals = []
-        
-        for item in grammar.values():
-            item = "".join(item)
-        
-            terminals.extend([k for k in item if not k.isupper()])
-        
-        terminals = list(set(terminals + ["$"]))
-        terminals.remove("e")
-        
-        start_symbol = non_terminals[0]
-        non_terminals, terminals, start_symbol
-        
-        def first(t):
-            productions = grammar[t]
-            first_set = []
-        
-            for production in productions:
-                first_item = production[0]
-        
-                for item in production:
-                    if item in non_terminals:
-                        firsts_of_next = first(first_item)
-        
-                        if "e" in firsts_of_next:
-                            # firsts_of_next.remove("e")
-                            first_set.extend(firsts_of_next)
-                        else:
-                            first_set.extend(firsts_of_next)
-                            break
-        
-                    else:
-                        first_set.append(item)
-                        break
-        
-            return list(set(first_set))
-        
-        def follow(t, his=[]):
-            if t in his:
-                return []
-        
-            his.append(t)
-            
-            if t == start_symbol:
-                follow_set = ["$"]
+# E  -> TE’
+# E’ -> +T E’|Є
+# T  -> F T’
+# T’ -> *F T’ | Є
+# F  -> (E) | id
+
+# E' = A
+# T' = B
+# id = i
+
+grammar = {
+    "E": ["TA"],
+    "A": ["+TA", "e"],
+    "T": ["FB"],
+    "B": ["*FB", "e"],
+    "F": ["(E)","i"]
+}
+
+non_terminals = list(grammar.keys())
+
+terminals = []
+
+for item in grammar.values():
+    item = "".join(item)
+
+    terminals.extend([k for k in item if not k.isupper()])
+
+terminals = list(set(terminals + ["$"]))
+terminals.remove("e")
+
+start_symbol = non_terminals[0]
+non_terminals, terminals, start_symbol
+
+def first(t):
+    productions = grammar[t]
+    first_set = []
+
+    for production in productions:
+        first_item = production[0]
+
+        for item in production:
+            if item in non_terminals:
+                firsts_of_next = first(first_item)
+
+                if "e" in firsts_of_next:
+                    # firsts_of_next.remove("e")
+                    first_set.extend(firsts_of_next)
+                else:
+                    first_set.extend(firsts_of_next)
+                    break
+
             else:
-                follow_set = []
-            
-            # find productions that contain t
-            for left, right in grammar.items():
-                # check if there is right recursion or the non terminal has already been explored
-                for item in right:
-                    # the production contains t then do the algorithm
-                    if t in item:
-                        # find the position of t
-                        idx = item.index(t)
-                        try:
-                            # try to get the character ith step to the right of t
-                            i = 1
-                            while True:
-                                next_item = item[idx+i]
-                                if next_item in non_terminals:
-                                    # if the next item in a terminal then find the first of the next time
-                                    firsts_of_next = first(next_item)
-        
-                                    if "e" in firsts_of_next:
-                                        firsts_of_next.remove("e")
-                                        follow_set.extend(firsts_of_next)
-                                        follow_set.extend(follow(left, his))
-                                        i += 1
-                                    else:
-                                        follow_set.extend(firsts_of_next)
-                                        break
-                                        
-                                else:
-                                    # else it is a non-terminakl, so add it to the follow set
-                                    follow_set.append(next_item)
-                                    break
-                            
-                        except:
-                            # if there are no characters to the right of t, then find the follow of the left side of the rule
-                            follow_set.extend(follow(left, his))
-            return list(set(follow_set))
-        
-        import pandas as pd
-        
-        df = pd.DataFrame(index=non_terminals, columns=terminals).fillna("")
-        productions = []
-        for left, right in grammar.items():
-            for item in right:
-                productions.append((left, item))
-        
-        for left, right in productions:
-            symbols = first(left)
-            
-            if "e" in symbols:
-                symbols.extend(follow(left, []))
-                symbols.remove("e")
-        
-            string = f"{left} -> {right}"
-        
-            for t in symbols:
-                df.loc[left, t] = string
-        
-        df
+                first_set.append(item)
+                break
+
+    return list(set(first_set))
+
+def follow(t, his=[]):
+    if t in his:
+        return []
+
+    his.append(t)
+    
+    if t == start_symbol:
+        follow_set = ["$"]
+    else:
+        follow_set = []
+    
+    # find productions that contain t
+    for left, right in grammar.items():
+        # check if there is right recursion or the non terminal has already been explored
+        for item in right:
+            # the production contains t then do the algorithm
+            if t in item:
+                # find the position of t
+                idx = item.index(t)
+                try:
+                    # try to get the character ith step to the right of t
+                    i = 1
+                    while True:
+                        next_item = item[idx+i]
+                        if next_item in non_terminals:
+                            # if the next item in a terminal then find the first of the next time
+                            firsts_of_next = first(next_item)
+
+                            if "e" in firsts_of_next:
+                                firsts_of_next.remove("e")
+                                follow_set.extend(firsts_of_next)
+                                follow_set.extend(follow(left, his))
+                                i += 1
+                            else:
+                                follow_set.extend(firsts_of_next)
+                                break
+                                
+                        else:
+                            # else it is a non-terminakl, so add it to the follow set
+                            follow_set.append(next_item)
+                            break
+                    
+                except:
+                    # if there are no characters to the right of t, then find the follow of the left side of the rule
+                    follow_set.extend(follow(left, his))
+    return list(set(follow_set))
+
+import pandas as pd
+
+df = pd.DataFrame(index=non_terminals, columns=terminals).fillna("")
+productions = []
+for left, right in grammar.items():
+    for item in right:
+        productions.append((left, item))
+
+for left, right in productions:
+    symbols = first(left)
+    
+    if "e" in symbols:
+        symbols.extend(follow(left, []))
+        symbols.remove("e")
+
+    string = f"{left} -> {right}"
+
+    for t in symbols:
+        df.loc[left, t] = string
+
+df
 
 </pre>
 </body>

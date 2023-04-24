@@ -11,29 +11,29 @@
 <body>
 
     <pre>
-        visited =[]
-        queue = []   
-        def bfs(visited, node , final):
-            visited.extend(node)
-            queue.extend(node)
-        
-            while queue:
-                print(queue)
-                m = queue.pop(0)
-        
-                for i in graph[m]:
-                    print(i)
-                    if i not in visited:
-                        visited.append(i)
-                        queue.append(i)
-                        if i == final:
-                            return True
-            return False
-        
-        print(bfs(visited, '5', '8'))
-        
-        for i in visited:
-            print(i, end = "->")
+visited =[]
+queue = []   
+def bfs(visited, node , final):
+    visited.extend(node)
+    queue.extend(node)
+
+    while queue:
+        print(queue)
+        m = queue.pop(0)
+
+        for i in graph[m]:
+            print(i)
+            if i not in visited:
+                visited.append(i)
+                queue.append(i)
+                if i == final:
+                    return True
+    return False
+
+print(bfs(visited, '5', '8'))
+
+for i in visited:
+    print(i, end = "->")
 
 
 -----------------------------------------------------
