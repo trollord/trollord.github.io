@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+
+# 2 For anydataset visialize the following types of chart : Scatterplot. Bubble Chart, Bar Chart ,  Dot Plots ,Histogram ,Box Plot ,Pie Chart
+
+# Sample dataset
+set.seed(123) # for reproducibility
+data <- data.frame(
+    X = rnorm(100),                 # Random numeric data for X-axis
+    Y = rnorm(100),                 # Random numeric data for Y-axis
+    Size = runif(100, 1, 10),      # Random sizes for bubbles
+    Category = sample(letters[1:5], 100, replace = TRUE),  # Categories for bar chart and pie chart
+    Value = rpois(100, 5)          # Random data for bar chart
+)
+
+# Scatterplot
+plot(data$X, data$Y, main = "Scatterplot", xlab = "X-axis", ylab = "Y-axis")
+
+# Bubble Chart
+library(ggplot2)
+ggplot(data, aes(x = X, y = Y, size = Size)) +
+    geom_point() +
+    labs(title = "Bubble Chart", x = "X-axis", y = "Y-axis")
+
+# Bar Chart
+barplot(table(data$Category), main = "Bar Chart", xlab = "Category", ylab = "Frequency")
+
+# Dot Plot
+stripchart(data$X, main = "Dot Plot", xlab = "X-axis")
+
+# Histogram
+hist(data$X, main = "Histogram", xlab = "X-axis")
+
+# Box Plot
+boxplot(data$X, main = "Box Plot")
+
+# Pie Chart
+pie(table(data$Category), main = "Pie Chart")
+        
+        
+
+	</pre>
+</body>
+
+</html>

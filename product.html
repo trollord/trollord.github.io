@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+
+# 4 The following table shows the number of units of different products sold on different days:
+
+# Create numeric vectors for each product's daily sales
+bread_sales <- c(12, 3, 5, 11, 9)
+milk_sales <- c(21, 27, 18, 20, 15)
+cola_cans_sales <- c(10, 1, 33, 6, 12)
+chocolate_bars_sales <- c(6, 7, 4, 13, 12)
+detergent_sales <- c(5, 8, 12, 20, 23)
+
+# Create a vector of days
+days <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+# Visualize the data using bar plots
+par(mfrow = c(2, 3))  # Arrange the plots in a 2x3 grid
+
+# Bread sales
+barplot(bread_sales, names.arg = days, main = "Bread Sales", xlab = "Day", ylab = "Units Sold")
+
+# Milk sales
+barplot(milk_sales, names.arg = days, main = "Milk Sales", xlab = "Day", ylab = "Units Sold")
+
+# Cola Cans sales
+barplot(cola_cans_sales, names.arg = days, main = "Cola Cans Sales", xlab = "Day", ylab = "Units Sold")
+
+# Chocolate Bars sales
+barplot(chocolate_bars_sales, names.arg = days, main = "Chocolate Bars Sales", xlab = "Day", ylab = "Units Sold")
+
+# Detergent sales
+barplot(detergent_sales, names.arg = days, main = "Detergent Sales", xlab = "Day", ylab = "Units Sold")
+        
+        
+        
+
+	</pre>
+</body>
+
+</html>

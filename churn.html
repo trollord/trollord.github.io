@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+# 7 Analyse and visualize churn modelling data using R.
+
+# Load the churn modeling data
+churn_data <- read.csv("E:\\Thadomal Shahani Engineering College\\Sem 7\\Assignments\\Big Data Analysis\\Pracs and Viva\\BDA Datasets\\Churn_Modelling.csv", header = TRUE)
+
+# Exploratory Data Analysis (EDA)
+cat("First few rows of the dataset:\n")
+print(head(churn_data))
+cat("\nDataset structure:\n")
+print(str(churn_data))
+cat("\nSummary statistics for the dataset:\n")
+print(summary(churn_data))
+
+# Data Visualization
+par(mfrow = c(2, 2))  # Arrange plots in a 2x2 grid
+
+# Histogram for Age
+hist(churn_data$Age, main = "Distribution of Age", xlab = "Age")
+
+# Boxplot for CreditScore by Geography
+boxplot(CreditScore ~ Geography, data = churn_data, main = "CreditScore by Geography")
+
+# Barplot for Gender
+barplot(table(churn_data$Gender), main = "Gender Distribution", xlab = "Gender")
+
+# Pie chart for Churn Rate
+churn_rate <- mean(churn_data$Exited) * 100
+labels <- c("Churned", "Not Churned")
+sizes <- c(churn_rate, 100 - churn_rate)
+pie(sizes, labels, main = "Churn Rate", col = c("red", "green"))
+
+# Churn Analysis
+overall_churn_rate <- sum(churn_data$Exited) / nrow(churn_data) * 100
+churn_by_geography <- aggregate(Exited ~ Geography, data = churn_data, FUN = function(x) sum(x) / length(x) * 100)
+churn_by_gender <- aggregate(Exited ~ Gender, data = churn_data, FUN = function(x) sum(x) / length(x) * 100)
+
+cat("\nOverall Churn Rate: ", overall_churn_rate, "%\n")
+cat("\nChurn Rate by Geography:\n")
+print(churn_by_geography)
+cat("\nChurn Rate by Gender:\n")
+print(churn_by_gender)
+        
+        
+
+	</pre>
+</body>
+
+</html>

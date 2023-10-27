@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+# 9 Analyse and visualize supermarket data using R.
+
+# Load the supermarket data
+supermarket_data <- read.csv("E:\\Thadomal Shahani Engineering College\\Sem 7\\Assignments\\Big Data Analysis\\Pracs and Viva\\BDA Datasets\\supermarket_sales.csv", header = TRUE)
+
+# Exploratory Data Analysis (EDA)
+cat("First few rows of the dataset:\n")
+print(head(supermarket_data))
+cat("\nDataset structure:\n")
+print(str(supermarket_data))
+cat("\nSummary statistics for the dataset:\n")
+print(summary(supermarket_data))
+
+# Data Visualization
+par(mfrow = c(2, 2))  # Arrange plots in a 2x2 grid
+
+# Histogram for Unit price
+hist(supermarket_data$Unit.price, main = "Distribution of Unit Price", xlab = "Unit Price")
+
+# Barplot for Branch
+barplot(table(supermarket_data$Branch), main = "Branch Distribution", xlab = "Branch")
+
+# Scatterplot for Quantity vs. `Unit price`
+plot(supermarket_data$Quantity, supermarket_data$`Unit price`, pch = 19, main = "Quantity vs. Unit Price", xlab = "Quantity", ylab = "Unit Price")
+
+# Barplot for Customer type
+plot(supermarket_data$Quantity, supermarket_data$`Unit price`, pch = 19, main = "Quantity vs. Unit Price", xlab = "Quantity", ylab = "Unit Price", xlim = c(0, max(supermarket_data$Quantity)), ylim = c(0, max(supermarket_data$Unit.price)))
+
+# Sales Analysis
+total_sales_by_branch <- tapply(supermarket_data$`Total`, supermarket_data$Branch, sum)
+top_selling_products <- names(sort(table(supermarket_data$Product.line), decreasing = TRUE)[1:5])
+gross_income_by_branch <- tapply(supermarket_data$gross.income, supermarket_data$Branch, sum)
+
+cat("\nTotal Sales by Branch:\n")
+print(total_sales_by_branch)
+cat("\nTop Selling Products:\n")
+print(top_selling_products)
+cat("\nGross Income by Branch:\n")
+print(gross_income_by_branch)
+
+
+	</pre>
+</body>
+
+</html>

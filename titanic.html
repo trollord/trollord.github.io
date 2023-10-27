@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+# 10 Analyse and visualize Loan data using R
+
+# Load the loan data
+loan_data <- read.csv("E:\\Thadomal Shahani Engineering College\\Sem 7\\Assignments\\Big Data Analysis\\Pracs and Viva\\BDA Datasets\\loan_data_set.csv", header = TRUE)
+
+# Exploratory Data Analysis (EDA)
+cat("First few rows of the dataset:\n")
+print(head(loan_data))
+cat("\nDataset structure:\n")
+print(str(loan_data))
+cat("\nSummary statistics for the dataset:\n")
+print(summary(loan_data))
+
+# Data Visualization
+par(mfrow = c(2, 2))  # Arrange plots in a 2x2 grid
+
+# Histogram for ApplicantIncome
+hist(loan_data$ApplicantIncome, main = "Applicant Income Distribution", xlab = "Applicant Income")
+
+# Barplot for Gender
+barplot(table(loan_data$Gender), main = "Gender Distribution", xlab = "Gender")
+
+# Scatterplot for ApplicantIncome vs. CoapplicantIncome
+plot(loan_data$ApplicantIncome, loan_data$CoapplicantIncome, pch = 19, main = "Applicant Income vs. Coapplicant Income", xlab = "Applicant Income", ylab = "Coapplicant Income")
+
+# Barplot for Loan_Status
+barplot(table(loan_data$Loan_Status), main = "Loan Status Distribution", xlab = "Loan Status")
+
+# Loan Approval Analysis
+approval_by_gender <- table(loan_data$Gender, loan_data$Loan_Status)
+approval_by_education <- table(loan_data$Education, loan_data$Loan_Status)
+credit_history_approval <- table(loan_data$Credit_History, loan_data$Loan_Status)
+
+cat("\nLoan Approval by Gender:\n")
+print(approval_by_gender)
+cat("\nLoan Approval by Education:\n")
+print(approval_by_education)
+cat("\nCredit History vs. Loan Approval:\n")
+print(credit_history_approval)
+
+	</pre>
+</body>
+
+</html>

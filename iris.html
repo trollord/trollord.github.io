@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+# 8 Analyse and visualize IRIS data using R.
+
+
+# Load the IRIS dataset
+data(iris)
+
+# Exploratory Data Analysis (EDA)
+cat("First few rows of the dataset:\n")
+head(iris)
+cat("\nDataset structure:\n")
+str(iris)
+cat("\nSummary statistics for the dataset:\n")
+summary(iris)
+
+# Data Visualization
+par(mfrow = c(2, 2))  # Arrange plots in a 2x2 grid
+
+# Histogram for Sepal.Length
+hist(iris$Sepal.Length, main = "Distribution of Sepal.Length", xlab = "Sepal.Length")
+
+# Boxplot for Sepal.Length by Species
+boxplot(Sepal.Length ~ Species, data = iris, main = "Boxplot of Sepal.Length by Species")
+
+# Scatterplot for Sepal.Length vs. Sepal.Width
+plot(iris$Sepal.Length, iris$Sepal.Width, pch = 19, col = iris$Species, main = "Sepal Length vs. Sepal Width", xlab = "Sepal Length", ylab = "Sepal Width")
+legend("topright", legend = levels(iris$Species), col = 1:3, pch = 19)
+
+# Pair Plot
+library(GGally)
+ggpairs(iris, columns = 1:4, aes(color = Species))
+
+# Statistical Analysis
+cat("Mean of Sepal.Length by Species:\n")
+aggregate(Sepal.Length ~ Species, data = iris, FUN = mean)
+
+cat("\nCorrelation Matrix:\n")
+cor(iris[, 1:4])
+
+	</pre>
+</body>
+
+</html>

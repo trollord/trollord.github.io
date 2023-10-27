@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+
+# 6 The data analyst of Argon technology Mr. John needs to enter the salaries of 10 employees in 
+# R. The salaries of the employees are given in the following table: 
+    
+    # i)
+    # Create a data frame with the initial salaries data
+    employee_data <- data.frame(
+    "SrNo" = 1:10,
+    "NameOfEmployees" = c("Vivek", "Karan", "James", "Soham", "Renu", "Farah", "Hetal", "Mary", "Ganesh", "Krish"),
+    "Salaries" = c(21000, 55000, 67000, 50000, 54000, 40000, 30000, 70000, 20000, 15000)
+    )
+
+# Display the employee_data data frame
+print(employee_data)
+
+# ii)
+# Create a data frame for the new employees
+new_employees <- data.frame(
+    "SrNo" = 11:15,
+    "NameOfEmployees" = c("John", "Sarah", "Emily", "Tom", "Lisa"),
+    "Salaries" = c(48000, 60000, 52000, 45000, 58000)
+)
+
+# Combine the new data with the existing data
+combined_data <- rbind(employee_data, new_employees)
+
+# Display the combined data
+print(combined_data)
+
+
+#iii)
+# Load the ggplot2 library for visualization
+library(ggplot2)
+
+# Create a bar chart to visualize salaries
+p <- ggplot(combined_data, aes(x = reorder(`NameOfEmployees`, -Salaries), y = Salaries)) +
+    geom_bar(stat = "identity") +
+    labs(title = "Salaries of Employees", x = "Employee Names", y = "Salary") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(p)
+        
+
+	</pre>
+</body>
+
+</html>

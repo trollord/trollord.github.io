@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+
+# 5 Create a subset of subject less than 4 by using subset () funcon and demonstrate the output.
+# Create a subject where the subject column is less than 3 and the class equals to 2 by using []
+# brackets and demonstrate the output using R
+
+# Create the data frame
+data <- data.frame(
+    Subject = 1:6,
+    Class = c(1, 2, 1, 2, 1, 2),
+    Marks = c(56, 75, 48, 69, 84, 53)
+)
+
+# i) Create a subset of subjects less than 4
+subset_result <- subset(data, Subject < 4)
+
+# Show the subset result
+print("Subset of subjects less than 4:")
+print(subset_result)
+
+# ii) Create a subset using [] brackets
+subset_result2 <- data[data$Subject < 3 & data$Class == 2, ]
+
+# Show the subset result
+print("Subset using [] brackets:")
+print(subset_result2)
+
+# iii) Visualize the data
+# Load the ggplot2 library for visualization
+library(ggplot2)
+
+# Create a scatterplot
+p <- ggplot(data, aes(x = Subject, y = Marks)) + geom_point() + labs(title = "Scatterplot of Marks by Subject", x = "Subject", y = "Marks")
+print(p)
+
+	</pre>
+</body>
+
+</html>
