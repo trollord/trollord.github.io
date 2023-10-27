@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMMING</title>
+</head>
+
+<body>
+
+    <pre>
+
+stream = list(map(int, input('enter input stream: ').split()))
+
+m = int(input('enter mod: '))
+fxn = input('enter hash fxn: ')
+hash = []
+for j in range(0, len(fxn)):
+    if fxn[j] == 'x':
+        if j == 0:
+            hash.append(1)
+        else:
+            hash.append(int(fxn[j-1]))
+    elif fxn[j] == '+':
+        hash.append(int(fxn[j+1]))
+
+if len(hash) == 1:
+    hash.append(0)
+
+hashes = []
+for val in stream:
+    hashes.append((hash[0]*val+hash[1])%m)
+
+print(f'\nhash values: {hashes}')
+print(f'hash values binary: {list(map(lambda x:bin(x).replace("0b", ""), hashes))}')
+
+def calc_trailing_zeroes(n):
+    c = 0
+    while 1:
+        if n == 0:
+            c = 0
+            break
+        elif n&1 == 0:
+            c += 1
+            n >>= 1
+        else:
+            break
+
+    return c
+
+trailing_zeroes_count = list(map(calc_trailing_zeroes, hashes))
+print(f'trailing zeroes: {trailing_zeroes_count}')
+
+print(f'\nnumber of distinct elements: {2**max(trailing_zeroes_count)}')
+
+</pre>
+</body>
+
+</html>
