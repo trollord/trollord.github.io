@@ -12,7 +12,42 @@
 
     <pre>
 
-        pig ka commands 
+        1. pig -x local
+
+        pig.txt: 1,abc,2000
+             2,def,3000
+             3,ghi,4000
+        
+        2. employeeData = '/home/cloudera/pig.txt' USING PigStorage(',') AS (id:int,name:chararray,salary:int);
+        
+        3. DESCRIBE employeeData
+        
+        4. DUMP employeeData;
+        
+        5. filterData = FILTER employeeData BY salary>2000;
+        
+        6. DUMP filterData;
+        
+        7. salaryDetails = FOREACH employeeData GENERATE id,salary;
+        
+        8. DUMP salaryDetails;
+        
+        9. Create student.txt: 1,abc,20,96
+                            2,def,21,97
+                           3,ghi,22,99
+                       4,jkl,21,98
+                       5,mno,20,92
+        
+        10. studentData = '/home/cloudera/student.txt' USING PigStorage(',') AS (id:int,name:chararray,age:int,marks:int);
+        
+        11. groupedStudentData = GROUP studentData BY age;
+        
+        12. DUMP groupedStudentData;
+        
+        13. innerJoin = JOIN employeeData BY id, studentData BY id;
+        
+        14. DUMP innerJoin;
+        
 
 </pre>
 </body>
