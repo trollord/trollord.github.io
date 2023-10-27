@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rsort</title>
+</head>
+
+<body>
+
+    <pre>
+# Create the vector
+values <- c(23, 45, 10, 34, 89, 20, 67, 99)
+
+# Sort the vector in ascending order
+sorted_asc <- sort(values)
+
+# Sort the vector in descending order
+sorted_desc <- sort(values, decreasing = TRUE)
+
+# Create a bar graph to visualize the sorted values
+par(mfrow = c(1, 2))  # Set up a 1x2 grid for side-by-side plots
+
+# Plot the ascending order
+barplot(sorted_asc, main = "Ascending Order", xlab = "Index", ylab = "Value")
+
+# Plot the descending order
+barplot(sorted_desc, main = "Descending Order", xlab = "Index", ylab = "Value")
+
+# Reset the plotting parameters
+par(mfrow = c(1, 1))
+        
+
+</pre>
+</body>
+
+</html>
