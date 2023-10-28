@@ -14,6 +14,42 @@
 
 create table emp (id INT, name STRING) row format delimited fields terminated by '1' stored as textfile
 
+1. hive
+
+2. show databases;
+
+3. show tables;
+
+4. create database bank;
+
+5. use bank;
+
+6. create table emp(id INT, name STRING, sal DOUBLE) row format delimited fields terminated by ',' stored as textfile;
+
+7. describe emp;
+
+8. create demo.txt in '/home/training/demo.txt'
+	data:	10, raj, 1000
+		20, rahul, 2000
+		30, rohan, 3000
+9. load data local inpath '/home/training/demo.txt'
+
+10. select * from emp;
+
+11. alter table emp rename to emp_sal;
+
+12. select * from emp_sal where id=12;
+
+13. select (*) count from emp_sal;
+
+14. select avg(sal) as avg_salary from emp_sal;
+
+15. select max(sal) as max_salary from emp_sal;
+
+16. drop table emp_sal;
+
+17. exit;
+
 
 </pre>
 </body>

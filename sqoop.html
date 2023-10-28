@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HAMMING</title>
+</head>
+
+<body>
+	<pre>
+        1. mysql -u root -p
+        (password: cloudera)
+     
+     2. show databases; 
+      
+     3. use school
+     
+     4. create table register(accno varchar(20), name varchar(20), number varchar(20), email varchar(20), age varchar(3));
+     
+     4. describe register;
+      
+     5. insert into register values("1", "raj", "1224", "raj@gmail.com", 22);
+      
+     6. select * from register;
+     
+     7. exit;
+     
+     8. sqoop import --connect jdbc:mysql://localhost:3306/school --username root --password cloudera --table register --target-dir=/home/cloudera/mydata -m 1
+     
+     9. hadoop fs -ls /home/cloudera/mydata
+     
+     10. hadoop fs -cat /home/cloudera/mydata/part-m-0000
+     
+     11. mysql -u root -p
+         (password: cloudera)
+     
+     12. create table registercopy(accno varchar(20), name varchar(20), number varchar(20), email varchar(20), age varchar(3));
+     
+     13. exit;
+     
+     14. sqoop export --connect jdbc:mysql://localhost:3306/school --username root --password cloudera --table registercopy --export-dir /home/cloudera/mydata
+     
+     15. mysql -u root -p
+         (password: cloudera)
+     
+     16. use school;
+     
+     17. select * from registercopy;
+
+	</pre>
+</body>
+
+</html>

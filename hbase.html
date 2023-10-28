@@ -11,7 +11,51 @@
 <body>
 
     <pre>
-HBASE
+        1. hbase shell
+
+        2. create 'register', 'accno', 'name', 'age', 'accno'
+        
+        3. list
+        
+        4. disable 'register'
+        
+        5. is_disabled 'register'
+        
+        6. enable 'register'
+        
+        7. describe 'register'
+        
+        8. alter 'register', NAME => 'age', VERSION => 5
+        
+        9. exists 'register'
+        
+        10. drop 'register'
+        
+        11. disable 'register'
+        
+        12. drop 'register'
+        
+        13. create 'register', 'personal data', 'acc data'
+        
+        14. put 'register', '1', 'personal data:name', 'raj'
+        
+        15. put 'register', '1', 'personal data:age', '11'
+        
+        16. put 'register', '1', 'personal data:email', 'raj@gmail.com'
+        
+        17. scan 'register'
+        
+        18. put 'register', '1', 'personal data:age', '22'
+        
+        19. scan 'register'
+        
+        20. get 'register', '1'
+        
+        21. delete 'register' '1', 'personal data:age', (copy the timestamp of creation)
+        
+        22. count 'register'
+        
+        23. truncate 'register'
 
 </pre>
 </body>
