@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sma</title>
+</head>
+
+<body>
+<pre>
+#Content analysis: Analyze the content of social media data to determine whattopics are being given data set using topic modelling, keyword extractor   
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+import matplotlib.pyplot as plt
+import gensim
+from nltk.corpus import stopwords
+import string
+import nltk
+
+nltk.download('stopwords')
+# Sample social media data
+data = {
+    'text': [
+        "I love my new smartphone, it has a great camera!",
+        "Artificial intelligence is the future of technology.",
+        "Machine learning algorithms are revolutionizing data analysis.",
+        "Cybersecurity is crucial for protecting sensitive information.",
+        "The Internet of Things (IoT) connects devices to improve efficiency.",
+        "Virtual reality gaming is changing the way we play games.",
+    ]
+}
+
+df = pd.DataFrame(data)
+
+# Preprocessing
+stop_words = set(stopwords.words('english'))
+punctuations = set(string.punctuation)
+def preprocess_text(text):
+    tokens = text.lower().split()
+    tokens = [token for token in tokens if token not in stop_words and token not in punctuations]
+    return ' '.join(tokens)
+
+df['processed_text'] = df['text'].apply(preprocess_text)
+
+# Vectorization using TF-IDF
+tfidf_vectorizer = TfidfVectorizer(max_features=1000)
+tfidf_matrix = tfidf_vectorizer.fit_transform(df['processed_text'])
+print(df)
+# Topic Modeling using LDA
+lda_model = LatentDirichletAllocation(n_components=2, random_state=42)  # Assuming 2 topics
+lda_matrix = lda_model.fit_transform(tfidf_matrix)
+
+# Get the most probable words for each topic
+def get_top_words(model, feature_names, n_top_words):
+    top_words = {}
+    for topic_idx, topic in enumerate(model.components_):
+        top_words_idx = topic.argsort()[:-n_top_words - 1:-1]
+        top_words[topic_idx] = [feature_names[i] for i in top_words_idx]
+    return top_words
+
+n_top_words = 5
+tfidf_feature_names = tfidf_vectorizer.get_feature_names_out()
+top_words_lda = get_top_words(lda_model, tfidf_feature_names, n_top_words)
+
+print("Top words for each topic (LDA):")
+for topic, words in top_words_lda.items():
+    print(f"Topic {topic}: {', '.join(words)}")
+
+# Visualize the topics
+plt.figure(figsize=(10, 5))
+for topic_idx, topic in enumerate(lda_model.components_):
+    plt.barh([f"Topic {topic_idx}"], [topic.sum()], color='skyblue')
+plt.xlabel('Word Count')
+plt.ylabel('Topics')
+plt.title('Word Count by Topics (LDA)')
+plt.show()
+
+import pandas as pd
+from nltk.corpus import stopwords
+import string
+
+# Sample social media data
+data = {
+    'topic': ['Technology', 'Technology', 'Technology', 'Security', 'IoT', 'Gaming'],
+    'text': [
+        "I love my new smartphone, it has a great camera!",
+        "Artificial intelligence is the future of technology.",
+        "Machine learning algorithms are revolutionizing data analysis.",
+        "Cybersecurity is crucial for protecting sensitive information.",
+        "The Internet of Things (IoT) connects devices to improve efficiency.",
+        "Virtual reality gaming is changing the way we play games.",
+    ]
+}
+
+df = pd.DataFrame(data)
+
+# Preprocessing
+stop_words = set(stopwords.words('english'))
+punctuations = set(string.punctuation)
+def preprocess_text(text):
+    tokens = text.lower().split()
+    tokens = [token for token in tokens if token not in stop_words and token not in punctuations]
+    return ' '.join(tokens)
+
+df['processed_text'] = df['text'].apply(preprocess_text)
+
+# Group by topic
+grouped_df = df.groupby('topic')['processed_text'].count().reset_index()
+print(grouped_df)
+print(list(grouped_df['processed_text']))
+
+
+counts = df.groupby('topic')['processed_text'].count()
+
+# grouped_df['word_count'] = grouped_df['processed_text'].apply(lambda x: len(x.split()))
+# print(grouped_df)
+
+import matplotlib.pyplot as plt
+plt.figure(figsize = (12,8))
+plt.bar(grouped_df['topic'], list(grouped_df['processed_text']) , color='skyblue')
+plt.show()
+
+
+from wordcloud import WordCloud
+
+
+comments = df['processed_text'].str.cat(sep=' ')
+word_cld = WordCloud(width=800, height=400 ).generate((comments))
+
+plt.figure(figsize = (12,8))
+plt.imshow(word_cld)
+plt.show()
+
+-------------------------------------------------------------------------------------------
+#Location analysis: Analyze the location data associated with tweets to understand where particular location are most prevalent.
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import re
+
+# Set global font size for matplotlib
+plt.rcParams.update({'font.size': 14})  # Set font size to 14
+
+# Generate random location data
+np.random.seed(0)
+num_tweets = 1000
+locations = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix']
+tweets_data = {
+    'text': [
+        "I love New York, it's the city that never sleeps!",
+        "I love New York, it's the city that never sleeps!",
+        "I love New York, it's the city that never sleeps!",
+        "Los Angeles is so beautiful this time of year.",
+        "Chicago deep-dish pizza is the best!",
+        "Houston, we have a problem.",
+        "I'm planning a trip to Phoenix next month.",
+        "New York and Los Angeles are both amazing cities.",
+        "Exploring the museums in Chicago was a great experience.",
+        "Phoenix weather is perfect for outdoor activities."
+    ]
+}
+
+df = pd.DataFrame(tweets_data)
+
+# Extract locations from text using regex
+def extract_location(text):
+    matches = re.findall(r'\b(?:New York|Los Angeles|Chicago|Houston|Phoenix)\b', text)
+    return matches[0] if matches else None
+
+df['location'] = df['text'].apply(extract_location)
+print(df)
+# Count occurrences of each location
+location_counts = df['location'].value_counts().reset_index()
+location_counts.columns = ['location', 'count']
+
+# Plotting bar chart
+plt.figure(figsize=(12, 6))
+# plt.subplot(1, 2, 1)
+plt.bar(location_counts['location'], location_counts['count'], color='skyblue')
+plt.xlabel('Location')
+plt.ylabel('Number of Tweets')
+plt.title('Distribution of Tweets by Location (Bar Chart)')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+
+plt.figure(figsize=(12, 6))
+# Plotting pie chart
+# plt.subplot(1, 2, 2)
+plt.pie(location_counts['count'], labels=location_counts['location'], autopct='%1.1f%%', colors=plt.cm.tab20.colors)
+plt.title('Distribution of Tweets by Location (Pie Chart)')
+plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+plt.tight_layout()
+plt.show()
+
+print(location_counts)
+
+-------------------------------------------------------------------------------------------
+#Trend analysis : Analyze the time data associated with social media and analyse its trends.
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+from collections import defaultdict
+import numpy as np
+# Sample data with time-related sentences
+data = {
+    'text': [
+        "I posted a photo at 3 PM yesterday.",
+        "We had a great meeting at 9 AM this morning.",
+        "Tomorrow, we will start our event at 9 AM.",
+        "Tomorrow, we will start our event at 9 AM.",
+        "Last night, I finished coding at 1 AM.",
+        "Next week, our webinar is scheduled for 2 PM.",
+        "I always check emails in the afternoon.",
+        "Our team meets every Monday at 1 AM."
+    ]
+}
+
+df = pd.DataFrame(data)
+
+# Define a function to extract time-related entities using regex
+def extract_time_entities(text):
+    time_entities = re.findall(r'\b\d{1,2}\s?(?:AM|PM|am|pm)?(?:\s+[A-Z][a-z]+)?\b', text)
+    if len(time_entities) > 0:
+      return time_entities
+    else:
+      return ["No Time"]
+
+
+# Apply the function to extract time entities from sentences
+df['time_entities'] = df['text'].apply(extract_time_entities)
+print(df)
+# Flatten the list of time entities
+print(df['time_entities'].value_counts())
+flat_time_entities = [time for sublist in df['time_entities'] for time in sublist]
+
+# Count occurrences of time entities
+time_counts = defaultdict(int)
+for time in flat_time_entities:
+    time_counts[time] += 1
+print(time_counts)
+# Plotting time trends
+plt.figure(figsize=(10, 6))
+plt.bar(time_counts.keys(), time_counts.values(), color='skyblue')
+plt.xlabel('Time Entities')
+plt.ylabel('Frequency')
+plt.title('Time Trends in Social Media Activities')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+
+# df_new = df['time_entities'].explode().value_counts().reset_index()
+
+df_new = df['time_entities'].value_counts().reset_index()
+
+print((df_new))
+
+list_l =list( df_new['time_entities'])
+list_j = list(df_new['count'])
+
+print([j[0] for j in  list_l])
+print([j for j in  list_j])
+
+
+plt.figure(figsize=(10, 6))
+plt.bar([j[0] for j in  list_l],[j for j in  list_j])
+plt.show()
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate sample time data
+np.random.seed(0)
+num_data_points = 1000
+start_date = pd.Timestamp('2024-01-01')
+end_date = pd.Timestamp('2024-12-31')
+date_range = pd.date_range(start_date, end_date, periods=num_data_points)
+# Simulate social media activities (e.g., posts, likes, comments)
+activities = np.random.choice(['Post', 'Like', 'Comment'], num_data_points)
+
+# Create DataFrame
+df = pd.DataFrame({'DateTime': date_range, 'Activity': activities})
+print(df)
+# Extract time components for analysis
+df['Date'] = df['DateTime'].dt.date
+df['Hour'] = df['DateTime'].dt.hour
+df['DayOfWeek'] = df['DateTime'].dt.day_name()
+print(df)
+
+# Count activities by day
+daily_activity = df.groupby('Date')['Activity'].count()
+
+# Count activities by hour
+hourly_activity = df.groupby('Hour')['Activity'].count()
+
+# Count activities by day of week
+day_of_week_activity = df.groupby('DayOfWeek')['Activity'].count()
+
+# Plotting trends
+plt.figure(figsize=(12, 6))
+
+# Daily activity trend
+plt.subplot(2, 2, 1)
+daily_activity.plot(kind='line')
+plt.title('Daily Activity Trend')
+plt.xlabel('Date')
+plt.ylabel('Activity Count')
+
+# Hourly activity trend
+plt.subplot(2, 2, 2)
+hourly_activity.plot(kind='bar', color='skyblue')
+plt.title('Hourly Activity Trend')
+plt.xlabel('Hour of Day')
+plt.ylabel('Activity Count')
+
+# Day of week activity trend
+plt.subplot(2, 2, 3)
+day_of_week_activity.plot(kind='bar', color='green')
+plt.title('Day of Week Activity Trend')
+plt.xlabel('Day of Week')
+plt.ylabel('Activity Count')
+
+plt.tight_layout()
+plt.show()
+
+-------------------------------------------------------------------------------------------
+#Hashtag popularity analysis: Determine which hashtags are most popular among different user groups.
+
+import pandas as pd
+import random
+import string
+import matplotlib.pyplot as plt
+
+# Generate a larger dataset of sentences with hashtags
+num_sentences = 1000
+sentences = []
+for _ in range(num_sentences):
+    sentence = " ".join(random.choices(string.ascii_lowercase.split(), k=random.randint(5, 15)))
+    num_hashtags = random.randint(0, 3)
+    for _ in range(num_hashtags):
+        sentence += f" #{random.choice(['tech', 'foodie', 'fitness', 'travel', 'art'])}"
+    sentences.append(sentence)
+
+
+
+
+
+
+
+#START HERE
+
+
+# Convert the dataset to a pandas DataFrame
+df = pd.DataFrame({'Sentences': sentences})
+print(df,'\n\n\n')
+# Function to extract hashtags from a sentence
+def extract_hashtags(sentence):
+    hashtags = []
+    words = sentence.split()
+    for word in words:
+        if word.startswith('#'):
+            hashtag = word.strip('#.,!?;:')
+            hashtags.append(hashtag.lower())  # Convert to lowercase for consistency
+    return hashtags
+
+
+
+# Apply the extract_hashtags function to the DataFrame
+df['Hashtags'] = df['Sentences'].apply(extract_hashtags)
+
+# Flatten the list of hashtags
+all_hashtags = [hashtag for sublist in df['Hashtags'] for hashtag in sublist]
+# print(df['Hashtags'].value_counts().reset_index())
+test_df = df['Hashtags'].value_counts().reset_index()
+print(test_df['Hashtags'][0])
+count = []
+hash = []
+for j in range(len(test_df['Hashtags'])):
+  if len(test_df['Hashtags'][j]) == 1:
+    # count.update({test_df['Hashtags'][j]:test_df['count'][j]})
+    hash.append(test_df['Hashtags'][j][0])
+    count.append(test_df['count'][j])
+
+print(hash)
+
+plt.bar(hash,count)
+
+
+-------------------------------------------------------------------------------------------
+#Sentiment analysis
+
+import pandas as pd
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import nltk
+nltk.download('vader_lexicon')
+# Sample tweets
+tweets = [
+    "I love sunny days!",
+    "The concert was amazing!",
+    "I hate Mondays.",
+    "The traffic is terrible.",
+    "This cake is delicious.",
+    "This movie is so boring."
+]
+
+# Initialize Sentiment Intensity Analyzer
+sid = SentimentIntensityAnalyzer()
+
+# Initialize lists for tweet and sentiment
+tweet_list = []
+sentiment_list = []
+
+# Perform sentiment analysis
+for tweet in tweets:
+    # Get sentiment scores
+    scores = sid.polarity_scores(tweet)
+    # Determine sentiment based on compound score
+    if scores['compound'] >= 0.05:
+        sentiment = "Positive"
+    elif scores['compound'] <= -0.05:
+        sentiment = "Negative"
+    else:
+        sentiment = "Neutral"
+
+    # Append tweet and sentiment to respective lists
+    tweet_list.append(tweet)
+    sentiment_list.append(sentiment)
+
+# Create DataFrame
+df = pd.DataFrame({'Tweet': tweet_list, 'Sentiment': sentiment_list})
+
+# Print the DataFrame
+print(df)
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+from tensorflow.keras.callbacks import EarlyStopping
+
+# Generate synthetic data for demonstration
+np.random.seed(0)
+num_samples = 10000
+sentiments = ['Positive', 'Negative']
+tweets = []
+labels = []
+
+for _ in range(num_samples):
+    sentiment = np.random.choice(sentiments)
+    if sentiment == 'Positive':
+        tweets.append("I love this!")
+    else:
+        tweets.append("I hate this!")
+
+    labels.append(sentiment)
+
+# Create DataFrame
+df = pd.DataFrame({'Tweet': tweets, 'Sentiment': labels})
+
+# Text preprocessing
+tokenizer = Tokenizer(num_words=1000, oov_token='<OOV>')
+tokenizer.fit_on_texts(df['Tweet'])
+sequences = tokenizer.texts_to_sequences(df['Tweet'])
+padded_sequences = pad_sequences(sequences, maxlen=20, padding='post', truncating='post')
+
+# Label encoding
+label_encoder = LabelEncoder()
+labels = label_encoder.fit_transform(df['Sentiment'])
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(padded_sequences, labels, test_size=0.2, random_state=42)
+
+# Build LSTM model
+model = Sequential()
+model.add(Embedding(input_dim=1000, output_dim=64, input_length=20))
+model.add(LSTM(128))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation='sigmoid'))
+
+# Compile model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Early stopping callback
+early_stop = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+
+# Train model
+history = model.fit(X_train, y_train, epochs=5, validation_data=(X_test, y_test), callbacks=[early_stop])
+
+# Evaluate model
+loss, accuracy = model.evaluate(X_test, y_test)
+print(f"Test Accuracy: {accuracy:.2f}")
+
+-------------------------------------------------------------------------------------------
+#Brand analysis: analyze the conversation around a particular brand for given dataset
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Generate mock conversation data
+np.random.seed(0)
+num_samples = 1000
+brands = ['BrandX', 'BrandY', 'BrandZ']
+conversations = []
+
+for _ in range(num_samples):
+    brand = np.random.choice(brands)
+    if brand == 'BrandX':
+        conversations.append("BrandX is the best! I love their products.")
+    elif brand == 'BrandY':
+        conversations.append("I had a bad experience with BrandY's customer service.")
+    else:
+        conversations.append("I'm thinking about trying out BrandZ's new product.")
+
+# Create DataFrame
+df = pd.DataFrame({'Brand': np.random.choice(brands, num_samples), 'Conversation': conversations})
+
+# Initialize Sentiment Intensity Analyzer
+sid = SentimentIntensityAnalyzer()
+
+# Perform sentiment analysis and add sentiment scores to DataFrame
+df['Sentiment'] = df['Conversation'].apply(lambda x: sid.polarity_scores(x)['compound'])
+
+# Initialize TF-IDF Vectorizer
+tfidf_vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
+
+# Fit and transform the text data
+tfidf_matrix = tfidf_vectorizer.fit_transform(df['Conversation'])
+
+# Get feature names
+feature_names = tfidf_vectorizer.get_feature_names_out()
+
+# Display top words associated with each brand based on TF-IDF scores
+for brand in brands:
+    print(f"\nTop words for {brand}:")
+    indices = df.index[df['Brand'] == brand]
+    top_words_indices = np.argsort(tfidf_matrix[indices].toarray().sum(axis=0))[::-1][:10]
+    top_words = [feature_names[idx] for idx in top_words_indices]
+    print(top_words)
+-------------------------------------------------------------------------------------------
+
+#Social Network data analysis for community detection and influential analytics for given problem using Girvan newman algorithm / Kmean clustering algorithm
+import networkx as nx
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+# Step 1: Load and Prepare Data (Assuming you have an edge list or adjacency matrix)
+
+# Example: Create a sample graph
+G = nx.karate_club_graph()
+
+# Step 2: Network Analysis
+# Visualize the graph
+plt.figure(figsize=(8, 6))
+nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray')
+plt.title('Social Network Graph')
+plt.show()
+
+# Step 3: Community Detection using Girvan-Newman Algorithm
+communities_generator = nx.algorithms.community.girvan_newman(G)
+communities = next(communities_generator)
+
+# Step 4: Influential Analytics using K-means Clustering
+# Example: Using degree centrality as features for influential node detection
+degree_centrality = nx.degree_centrality(G)
+nodes = list(G.nodes())
+X = np.array([[degree_centrality[node]] for node in nodes])
+
+# Apply K-means clustering
+kmeans = KMeans(n_clusters=2, random_state=0).fit(X)
+labels = kmeans.labels_
+
+# Step 5: Visualization
+# Plot communities
+pos = nx.spring_layout(G)  # Position nodes using Fruchterman-Reingold force-directed algorithm
+plt.figure(figsize=(10, 8))
+nx.draw(G, pos=pos, node_color=labels, cmap=plt.cm.Paired, with_labels=True)
+plt.title('Communities Detected by Girvan-Newman')
+plt.show()
+
+# Plot influential nodes
+plt.figure(figsize=(10, 8))
+nx.draw(G, pos=pos, node_color=labels, cmap=plt.cm.Paired, with_labels=True)
+nx.draw_networkx_nodes(G, pos=pos, nodelist=nodes, node_size=300 * np.sqrt(X.flatten()), node_color='r', alpha=0.5)
+plt.title('Influential Nodes Detected by K-means Clustering')
+plt.show()
+
+-------------------------------------------------------------------------------------------
+#Exp 3 data cleaning and storage preprocess
+
+
+import os
+import pandas as pd
+import re
+import spacy
+from nltk.stem import WordNetLemmatizer
+import nltk
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizerfrom google.colab import drive
+drive.mount('/content/drive')
+os.listdir("drive/MyDrive/dataset")
+
+df_comments = pd.read_csv("drive/MyDrive/dataset/merged_comments.csv")
+df_comments
+nltk.download('stopwords')
+lemmatizer = WordNetLemmatizer()
+nltk.download('wordnet')
+stop_words = set(stopwords.words('english'))
+
+print(stop_words)
+def process(text):
+  # remove links and punct
+  text = text.lower()
+  text = re.sub(r'[^\w]', ' ', text)
+  # remove stop words
+  words = text.split()
+  filter_word = [word for word in words if word.lower() not in stop_words]
+  # WordNetLemmatizer
+  lemma = [lemmatizer.lemmatize(word) for word in filter_word]
+  return ' '.join(lemma)
+
+df_comments['clean_comment'] = df_comments['Comment'].apply(process)
+print("DataFrame with Cleaned Comments:")
+print(df_comments['clean_comment'].head(10))
+comment = df_comments['Comment']
+clean_comment = df_comments['clean_comment']
+for i in range(5):
+  print(comment[i],'\n')
+  print(clean_comment[i],"\n\n\n")
+df_comments.head(10)
+df_comments.to_csv('saved.csv')
+
+-------------------------------------------------------------------------------------------
+    
+</pre>
+</body>
+
+</html>
