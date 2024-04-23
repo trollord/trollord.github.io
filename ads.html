@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADS</title>
+</head>
+
+<body>
+	<pre>
+# 1 Descriptive Analysis
+import pandas as pd
+import numpy as np
+from google.colab import drive
+drive.mount('/content/drive')
+df = pd.read_csv('/content/drive/My Drive/ADS/supermarket_sales - Sheet1.csv')
+df.head()
+#Mean SD LQ UQ max min
+df.describe()
+#Count of null values
+df.info()
+#Median
+df.median()
+#Mode
+print(df['Product line'].mode())
+print(df['City'].mode())
+print(df['Payment'].mode())
+print(df['Customer type'].mode())
+print(df['Gender'].mode())
+#Scatter plot
+import matplotlib.pyplot as plt
+plt.scatter(df['Tax 5%'], df['Unit price'], c ="blue")
+import matplotlib.pyplot as plt
+plt.scatter(df['gross income'], df['Unit price'], c ="blue")
+import matplotlib.pyplot as plt
+plt.scatter(df['Quantity'], df['Total'], c ="blue")
+#Box plot
+x2=df['Tax 5%']
+x4=df['gross income']
+x5=df['Rating']  
+data = pd.DataFrame({ "Tax 5%": x2,"gross income": x4,"Rating": x5})
+
+# Plot the dataframe
+ax = data[[ 'Tax 5%','gross income','Rating']].plot(kind='box', title='boxplot')
+plt.boxplot(df['Total'])
+#Trimmed mean
+from scipy import stats
+stats.trim_mean(df['Total'], 0.1)
+#Summation
+df['total'].sum()
+#Frequency
+count = df['Product line'].value_counts()
+print(count)
+#Variance
+df.var()
+#Correlation matrix
+df.corr()
+#Standard error of mean
+df.sem()
+#sum of squares 
+sos=0
+for val in df['Total']:
+    sos=val*val+sos
+print(sos)
+#Skewness
+df.skew()
+#kurtosis
+sr = pd.Series(df['Total'])
+print(sr.kurtosis())
+import seaborn as sns
+
+g=sns.distplot(df['Total'])
+
+
+# 2 Data Imputation 
+
+
+import pandas as pd
+import numpy as np
+df =pd.read_csv("/content/loan_data_set.csv")
+df
+na_variables = [ var for var in df.columns if df[var].isnull().mean() > 0 ]
+#for finding null values in cols
+na_variables
+
+# mean imputation
+df1 = df
+df1
+missing_col = ["LoanAmount"]
+
+for i in missing_col:
+  df1.loc[df1.loc[:,i].isnull(),i]=df1.loc[:,i].mean()
+
+df1
+
+# median imputation
+df2=df
+for i in missing_col:
+  df2.loc[df2.loc[:,i].isnull(),i]=df2.loc[:,i].median()
+
+df2
+# Mode imputation
+
+df4 = df
+df4
+missing_col = ["LoanAmount"]
+
+for i in missing_col:
+  df4.loc[df4.loc[:,i].isnull(),i]=df4.loc[:,i].mode()
+
+df4
+#categorical to numerical 
+
+from sklearn.preprocessing import OrdinalEncoder
+
+data=df
+oe =OrdinalEncoder()
+result = oe.fit_transform(data)
+print(result)
+#random sample
+df5=df
+df5['LoanAmount'].dropna().sample(df5['LoanAmount'].isnull().sum(),random_state=0)
+df5
+# frequent category imputation
+df6=df
+m= df6["Gender"].mode()
+m=m.tolist()
+
+frq_imp = df6["Gender"].fillna(m[0])
+frq_imp.unique()
+#regression imputation
+from sklearn.linear_model import LinearRegression
+lr = LinearRegression()
+df1=df[["CoapplicantIncome","LoanAmount"]]
+
+
+# col=df1["LoanAmount"].dropna()
+# df1.head()
+testdf = df1[df1['LoanAmount'].isnull()==True]
+testdf
+traindf = df1[df1['LoanAmount'].isnull()==False]
+traindf
+
+
+lr.fit(traindf['LoanAmount'],traindf['CoapplicantIncome'])
+# testdf.drop("LoanAmount",axis=1,inplace=True)
+# testdf
+pred = lr.predict(testdf)
+# testdf['LoanAmount']= pred
+
+#3 data visulation
+
+
+import pandas as pd
+import numpy as np
+from google.colab import drive
+drive.mount('/content/drive')
+df = pd.read_csv('/content/drive/My Drive/ADS/supermarket_sales - Sheet1.csv')
+
+df.head()
+#Scatter plot
+import matplotlib.pyplot as plt
+plt.scatter(df['Tax 5%'], df['Unit price'], c ="blue")
+
+#BoxPlot
+x2=df['Tax 5%']
+x4=df['gross income']
+x5=df['Rating']  
+data = pd.DataFrame({ "Tax 5%": x2,"gross income": x4,"Rating": x5})
+
+# Plot the dataframe
+ax = data[[ 'Tax 5%','gross income','Rating']].plot(kind='box', title='boxplot')
+
+#Distribution Chart / Distplot
+import seaborn as sns
+
+g=sns.distplot(df['Total'])
+#JoinPlot
+sns.jointplot(x ='Total', y ='Tax 5%', data = df)
+#Pairplot
+sns.pairplot(df)
+# to show
+plt.show()
+# Histogram
+df['Rating'].hist()
+plt.show()
+lst = df['Product line'].unique()
+print(lst)
+# t=[0,0,0,0,0,0]
+# for i in df:
+#   print(i)
+#   if i[5] in lst:
+#     if i[5]=='Health and beauty':
+#       t[0]=t[0]+i[9]
+
+# print(t)
+
+t=[23,17,35,29,12,41]
+plt.pie(t,labels=lst,autopct ='% 1.1f %%', shadow = True)
+plt.show()
+#Density Chart
+df['Rating'].plot.density(color='green')
+plt.title('Density plot for Speeding')
+plt.show()
+#scatter Matrix
+pd.plotting.scatter_matrix(df)
+# rugplot
+import seaborn as sns
+import matplotlib.pyplot as plt
+data = df
+data.head(5)
+plt.figure(figsize=(15,5))
+sns.rugplot(data=data, x ="Total")
+plt.show()
+#column chart
+# plot between 2 attributes
+df1 = df.head(10)
+df1.plot.bar()
+plt.bar(df1['Gender'], df1['Total'])
+plt.xlabel("Gender")
+plt.ylabel("Total")
+plt.show()
+
+#Parallel
+import plotly.express as px
+df1 =df.sample(n=100)
+fig = px.parallel_coordinates(df1, color="Total",
+                              dimensions=['Quantity','Unit price','Rating',],
+                              color_continuous_scale=px.colors.diverging.Tealrose,
+                              color_continuous_midpoint=2)
+fig.show()
+# Creating Andrews curves
+df1 = df[['Quantity','Total','Rating']]
+df1=df1.sample(n=50)
+x = pd.plotting.andrews_curves(df1,'Rating')
+ 
+# plotting the Curve
+x.plot()
+ 
+# Display
+plt.show()
+import plotly.express as px
+
+# df = px.data.medals_wide(indexed=True)
+fig = px.imshow(df1)
+fig.show()
+
+# 4.supervised learning 
+
+# Two sample Independent T Test
+men_arr=[]
+women_arr=[]
+import statistics ,math
+#  for t test
+for i in range(29):
+  if df["Gender"][i]=="Female":
+    women_arr.append(df["Quantity"][i])
+  else:
+    men_arr.append(df["Quantity"][i])
+
+# means
+men_mean= statistics.fmean(men_arr)
+women_mean= statistics.fmean(women_arr)
+
+# print(men_mean)
+# print(women_mean)
+
+#std dev if xbar is not given then std dev for both men and women comes out to be same
+men_std = statistics.stdev(men_arr,xbar=men_mean)
+women_std = statistics.stdev(women_arr,xbar=women_mean)
+# print(men_std)
+# print(women_std)
+
+# lengths
+men_len = len(men_arr)
+women_len =len(women_arr)
+
+# formula  
+
+lower = math.sqrt((1/men_len)+(1/women_len))
+s = math.sqrt((((men_len-1)*men_std*men_std)+((women_len-1)*women_std*women_std))/(men_len+women_len-2))
+print(s)
+
+T_SCORE = abs(men_mean-women_mean)/(s*lower)
+print(T_SCORE)
+# tscore cross verified by hand calc
+
+degree_freedom = men_len+women_len-2
+# we check degree_freedom=27 and alpha = 0.05
+tcritical = 1.703
+
+if T_SCORE > tcritical:
+  print("We reject Null Hypothesis")
+else :
+  print("We Do NOT REJECT Null Hypothesis")
+
+
+
+# Two sample Independent Z Test 
+# null hypo = meu2>meu1
+# alternate hypo =meu1 > meu2 so right tailed test at alpha = 0.05
+
+men_arr=[]
+women_arr=[]
+import statistics ,math
+#  for t test
+for i in range(100):
+  if df["Gender"][i]=="Female":
+    women_arr.append(df["Quantity"][i])
+  else:
+    men_arr.append(df["Quantity"][i])
+
+# means
+men_mean= statistics.fmean(men_arr)
+women_mean= statistics.fmean(women_arr)
+
+# print(men_mean)
+# print(women_mean)
+
+#std dev if xbar is not given then std dev for both men and women comes out to be same
+men_std = statistics.stdev(men_arr,xbar=men_mean)
+women_std = statistics.stdev(women_arr,xbar=women_mean)
+# print(men_std)
+# print(women_std)
+
+# lengths
+men_len = len(men_arr)
+women_len =len(women_arr)
+
+# formula  x1-x2/s
+
+lower = math.sqrt((men_std*men_std/men_len)+(women_std*women_std/women_len))
+
+Z_SCORE = abs(men_mean-women_mean)/lower
+print(Z_SCORE)
+
+Zcritical = 1.645
+
+if Z_SCORE > Zcritical:
+  print("We reject Null Hypothesis")
+else :
+  print("We Do NOT REJECT Null Hypothesis")
+
+#5 unsupervised learning
+from sklearn import datasets
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt 
+from sklearn.cluster import KMeans
+df = datasets.load_iris()
+y = df.target
+yframe=pd.DataFrame(y)
+dfr = pd.DataFrame(data=df.data, 
+                  columns=df.feature_names)
+dfr["target"] = yframe
+dfr
+kmeans_model =KMeans(n_clusters=3)
+y_kmeans = kmeans_model.fit(dfr[['sepal length (cm)','target']])
+dfr['kmeans_3']=kmeans_model.labels_
+dfr
+
+plt.scatter(x=dfr['sepal length (cm)'],y=dfr['target'],c = dfr['kmeans_3'])
+#Intrinsic Method
+from sklearn.metrics import silhouette_score
+silhouette_score(dfr[['sepal length (cm)','target']], dfr['kmeans_3'], metric = 'euclidean')
+#Adjusted Rand Index
+from sklearn.metrics.cluster import adjusted_rand_score
+adjusted_rand_score(df['target'], dfr['kmeans_3'])
+#Mutual Information
+from sklearn.metrics.cluster import normalized_mutual_info_score
+normalized_mutual_info_score(df['target'], dfr['kmeans_3'])
+
+#6 time series forecasting
+import numpy as np
+import pandas as pd
+import scipy
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels import tsa
+df = pd.read_csv("supermarket_sales - Sheet1.csv")
+df.head()
+df['Date'] = pd.to_datetime(df['Date'])
+df.head(2)
+data = df.loc[df['City'] == 'Yangon']
+r_col = ['Invoice ID', 'Branch', 'City', 'Customer type', 'Gender',
+       'Product line', 'Unit price', 'Quantity', 'Tax 5%',
+       'Time', 'Payment', 'cogs', 'gross margin percentage', 'gross income',
+       'Rating',]
+
+
+data.drop(r_col, axis =1 , inplace=True)
+data.head()
+data = data[["Date","Total"]]
+data = data.sort_values('Date')
+data.set_index('Date', inplace=True)
+data.head()
+df1=data
+data.plot(figsize=(15,6),legend=True)
+plt.ylabel("Sales",fontsize=18)
+plt.xlabel("Date",fontsize=18)
+plt.title("Date Vs Sales",fontsize=20)
+plt.show()
+from statsmodels.tsa.stattools import adfuller
+
+result = adfuller(data['Total'])
+print('ADF Statistic: ', result[0])
+print('p-value: ', result[1])
+
+data = data['Total'].resample('D').mean()
+data.head()
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+decompose_result_mult = seasonal_decompose(data, model="multiplicative")
+
+trend = decompose_result_mult.trend
+seasonal = decompose_result_mult.seasonal
+residual = decompose_result_mult.resid
+
+decompose_result_mult.plot();
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+fig = sm.graphics.tsa.plot_acf(data, lags=40)
+fig = sm.graphics.tsa.plot_pacf(data, lags=40)
+from sklearn.model_selection import train_test_split
+inputs = df1.index
+target = df1['Total'].copy()
+X_train, X_test, y_train, y_test = train_test_split(inputs,target, test_size=1/3, random_state=0)
+
+from statsmodels.tsa.arima.model import ARIMA
+from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error
+from math import sqrt
+
+model = ARIMA(y_train, order=(0,3,1))
+model_fit = model.fit()
+
+predictions = model_fit.forecast(len(y_test))
+
+mse = mean_squared_error(y_test, predictions)
+mae = mean_absolute_error(y_test, predictions)
+rmse = sqrt(mse)
+print(mse)
+print(mae)
+print(rmse)
+
+#7 outlier detection 
+
+from imblearn.over_sampling import SMOTE
+from matplotlib import pyplot
+from numpy import where
+import pandas as pd
+
+df = pd.read_csv('Churn_Modelling.csv')
+df.head()
+import seaborn as sns
+
+data = df[['CreditScore', 'Age', 'Exited',]]
+print(data.head(10))
+sns.scatterplot(data = data, x ='CreditScore', y = 'Age', hue = 'Exited')
+from sklearn.preprocessing import LabelEncoder
+for col in df.columns:
+  if df[col].dtype == 'O':
+    label_encode = LabelEncoder()
+    df[col] = label_encode.fit_transform(df[col])
+df
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+#Splitting the data
+from sklearn.tree import DecisionTreeClassifier
+X_train, X_test, y_train, y_test = train_test_split(df.drop('Exited',axis=1), df['Exited'], test_size = 0.2, random_state = 101)
+clf = DecisionTreeClassifier()
+clf.fit(X_train,y_train)
+y_pred=clf.predict(X_test)
+print(classification_report(y_test, y_pred))
+smote = SMOTE(sampling_strategy='auto',k_neighbors=5,random_state = 101)
+X_oversample, y_oversample = smote.fit_resample(X_train, y_train)
+clf.fit(X_oversample,y_oversample)
+y_predo=clf.predict(X_test)
+print(classification_report(y_test, y_predo))
+classifier = LogisticRegression()
+classifier.fit(X_train, y_train)
+
+print(classification_report(y_test, classifier.predict(X_test)))
+classifier.fit(X_oversample, y_oversample)
+print(classification_report(y_test, classifier.predict(X_test)))
+smote = SMOTE(random_state = 101)
+X, y = smote.fit_resample(df[['CreditScore', 'Age']], df['Exited'])
+#Creating a new Oversampling Data Frame
+df_oversampler = pd.DataFrame(X, columns = ['CreditScore', 'Age'])
+df_oversampler['Exited']=y
+print(df_oversampler.head())
+
+sns.countplot(data=df_oversampler,x='Exited')
+from collections import Counter
+X=df[['CreditScore', 'Age']]
+y=df['Exited']
+
+oversample = SMOTE()
+X, y = oversample.fit_resample(X, y)
+# summarize the new class distribution
+counter = Counter(y)
+print(counter)
+
+sns.scatterplot(data = df_oversampler, x ='CreditScore', y = 'Age', hue = 'Exited')
+
+#8 Smote 
+
+from imblearn.over_sampling import SMOTE
+from matplotlib import pyplot
+from numpy import where
+import pandas as pd
+
+df = pd.read_csv('Churn_Modelling.csv')
+df.head()
+import seaborn as sns
+
+data = df[['CreditScore', 'Age', 'Exited',]]
+print(data.head(10))
+sns.scatterplot(data = data, x ='CreditScore', y = 'Age', hue = 'Exited')
+from sklearn.preprocessing import LabelEncoder
+for col in df.columns:
+  if df[col].dtype == 'O':
+    label_encode = LabelEncoder()
+    df[col] = label_encode.fit_transform(df[col])
+df
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+#Splitting the data
+from sklearn.tree import DecisionTreeClassifier
+X_train, X_test, y_train, y_test = train_test_split(df.drop('Exited',axis=1), df['Exited'], test_size = 0.2, random_state = 101)
+clf = DecisionTreeClassifier()
+clf.fit(X_train,y_train)
+y_pred=clf.predict(X_test)
+print(classification_report(y_test, y_pred))
+smote = SMOTE(sampling_strategy='auto',k_neighbors=5,random_state = 101)
+X_oversample, y_oversample = smote.fit_resample(X_train, y_train)
+clf.fit(X_oversample,y_oversample)
+y_predo=clf.predict(X_test)
+print(classification_report(y_test, y_predo))
+classifier = LogisticRegression()
+classifier.fit(X_train, y_train)
+
+print(classification_report(y_test, classifier.predict(X_test)))
+classifier.fit(X_oversample, y_oversample)
+print(classification_report(y_test, classifier.predict(X_test)))
+smote = SMOTE(random_state = 101)
+X, y = smote.fit_resample(df[['CreditScore', 'Age']], df['Exited'])
+#Creating a new Oversampling Data Frame
+df_oversampler = pd.DataFrame(X, columns = ['CreditScore', 'Age'])
+df_oversampler['Exited']=y
+print(df_oversampler.head())
+
+sns.countplot(data=df_oversampler,x='Exited')
+from collections import Counter
+X=df[['CreditScore', 'Age']]
+y=df['Exited']
+
+oversample = SMOTE()
+X, y = oversample.fit_resample(X, y)
+# summarize the new class distribution
+counter = Counter(y)
+print(counter)
+
+sns.scatterplot(data = df_oversampler, x ='CreditScore', y = 'Age', hue = 'Exited')
+
+#9 inferatial 
+
+# import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.neighbors import NearestNeighbors
+data = pd.read_csv('Iris.csv')
+data.head()
+new_data=data.drop(['Id'],axis=1)
+new_data.boxplot()
+# create arrays
+X = new_data.drop('Species',axis=1).values
+
+# instantiate model
+nbrs = NearestNeighbors(n_neighbors = 3)
+
+# fit model
+nbrs.fit(X) 
+# distances and indexes of k-neaighbors from model outputs
+distances, indexes = nbrs.kneighbors(X)
+# plot mean of k-distances of each observation
+
+plt.plot(distances.mean(axis =1))
+# visually determine cutoff values > 0.15
+outlier_index = np.where(distances.mean(axis = 1) > 0.3)
+outlier_index
+# filter outlier values
+outlier_values = new_data.iloc[outlier_index]
+outlier_values
+# data wrangling
+import pandas as pd
+# visualization
+import matplotlib.pyplot as plt
+# algorithm
+from sklearn.cluster import DBSCAN
+# input data
+df = data[["SepalLengthCm", "SepalWidthCm"]]
+# specify & fit model
+model = DBSCAN(eps = 0.4, min_samples = 10).fit(df)
+# visualize outputs
+colors = model.labels_
+plt.scatter(df["SepalLengthCm"], df["SepalWidthCm"], c = colors)
+# outliers dataframe
+outliers = data[model.labels_ == -1]
+print(outliers)
+
+	</pre>
+</body>
+
+</html>
