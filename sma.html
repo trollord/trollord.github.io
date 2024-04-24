@@ -10,7 +10,8 @@
 
 <body>
 <pre>
-    1
+    1.Content analysis: Analyze the content of social media data to determine what 
+    topics are being given data set using topic modelling, keyword extractor
     '''
     This program first loads the social media data from a CSV file and removes any rows with missing values. It then uses the langdetect library to remove any non-English content, and performs text preprocessing by removing stopwords and performing lemmatization using the NLTK library.
     
@@ -80,7 +81,8 @@
     '''
     
     ----------------
-    1.1
+    1.1 Content analysis: Analyze the content of social media data to determine what 
+    topics are being given data set using topic modelling, keyword extractor
     import pandas as pd
     
     # !pip install pyLDAvis
@@ -117,7 +119,9 @@
     vis = pyLDAvis.gensim_models.prepare(lda_model, corpus, dictionary)
     pyLDAvis.display(vis)
     ------------------------------------------------------------------------------------------------------------------------------
-    2.
+    2.Location analysis: Analyze the location data associated with tweets to understand 
+    where particular location are most prevalent.
+    
     # Exp 2
     '''
     This program first loads the tweet data from a CSV file and removes any rows with missing values. It then creates a new column for the state abbreviation based on the location data by using a dictionary of state abbreviations and their full names, and a function that searches for these abbreviations in the location data.
@@ -176,7 +180,8 @@
     plt.show()
     
     ----------------------------------------------------------------------------------------
-    3.
+    3.Trend analysis : Analyze the time data associated with social media and analyse 
+    its trends
     # Exp 3
     
     '''
@@ -215,7 +220,8 @@
     plt.title('Social Media Trends')
     plt.show()
     ----------------------------------------------------------------------------
-    4.
+    4.Hashtag popularity analysis: Determine which hashtags are most popular among 
+    different user groups
     # Exp 4
     
     '''
@@ -255,7 +261,9 @@
             dataset['Country'][i] = loc_data['place']['country']
     '''
     ----------------------------------------------------------------------------------------------
-    5.
+    5.Sentiment Analysis for given dataset
+     Negative tweets analysis
+     Positive tweets analysis
     # Exp 5
     '''
     This program first reads the dataset into a pandas DataFrame. Then, it uses TextBlob to perform sentiment analysis on each tweet and stores the polarity score in a new column called "polarity".
@@ -291,7 +299,9 @@
     plt.legend()
     plt.show()
     -----------------------------------------------------------------------------------------------------------
-    6.
+    6.User engagement analysis: analyze how users engage with content on social 
+    media to understand what types of content are most engaging
+    
     # Exp 6
     '''
     To analyze how users engage with content on Twitter and understand what types of content are most engaging, we will use the following libraries:
@@ -345,7 +355,49 @@
     plt.title("Sentiment Analysis of Tweets")
     plt.show()
     -------------------------------------------------------------------------------------------------
-    BRAND 
+    7.Exploratory Data Analysis and visualization for given data set
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    # Load the dataset
+    df = pd.read_csv('data.csv')
+
+    # Explore the data
+    print(df.head())
+    print(df.info())
+    print(df.describe())
+    print(df.isnull().sum())
+
+    # Preprocessing
+    # Handle missing values
+    # Example: df = df.dropna() or df.fillna(value)
+    # For demonstration, let's fill missing numerical values with mean and categorical values with mode
+    df['numerical_column'].fillna(df['numerical_column'].mean(), inplace=True)
+    df['categorical_column'].fillna(df['categorical_column'].mode()[0], inplace=True)
+
+    # Data Visualization
+    plt.figure(figsize=(10, 6))
+    sns.histplot(df['numerical_column'], kde=True)
+    plt.title('Histogram of Numerical Column')
+    plt.xlabel('Value')
+    plt.ylabel('Frequency')
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(x='categorical_column', y='numerical_column', data=df)
+    plt.title('Boxplot of Numerical Column by Category')
+    plt.xlabel('Category')
+    plt.ylabel('Numerical Column')
+    plt.show()
+
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df.corr(), annot=True, cmap='coolwarm', fmt='.2f')
+    plt.title('Correlation Heatmap')
+    plt.show()
+    ----------------------------------------------------------------------------------------
+    8. Brand analysis: analyze the conversation around a particular brand for given 
+    dataset 
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
@@ -397,7 +449,47 @@
         top_words = [feature_names[idx] for idx in top_words_indices]
         print(top_words)
     ------------------------------------------------------------------------
-    10.
+
+    9.Analyze competitor activities using social media for given problem statement
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    from nltk import RAKE
+    import seaborn as sns
+
+    # Read competitor data from CSV files
+    competitor1_data = pd.read_csv('competitor1_data.csv')
+    competitor2_data = pd.read_csv('competitor2_data.csv')
+
+    # Extract keywords using NLTK RAKE
+    def extract_keywords(text):
+        rake = RAKE()
+        return rake.extract_keywords_from_text(text)
+
+    # Analyze competitors' social media activities
+    def analyze_competitors(competitor_data):
+        keywords = extract_keywords(' '.join(competitor_data['posts']))
+        # Perform analysis and return relevant metrics
+
+    # Collect and analyze data for each competitor
+    competitor1_metrics = analyze_competitors(competitor1_data)
+    competitor2_metrics = analyze_competitors(competitor2_data)
+
+    # Create DataFrame for comparative analysis
+    df = pd.DataFrame({'Competitor 1': competitor1_metrics, 'Competitor 2': competitor2_metrics})
+
+    # Plot results
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=df)
+    plt.title('Comparative Analysis of Competitors')
+    plt.xlabel('Metrics')
+    plt.ylabel('Values')
+    plt.xticks(rotation=45)
+    plt.show()
+    ------------------------------------------------------------------------
+    
+    10.Social Network data analysis for community detection and influential 
+    analytics for given problem using Girvan newman algorithm / Kmean clustering 
+    algorith
     import pandas as pd
     import warnings
     import networkx as nx
