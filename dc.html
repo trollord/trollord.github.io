@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dc</title>
+</head>
+
+<body>
+<pre>
+# 1 ipc client server
+import socket
+
+# Set up client
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print("\n", client, "\n")
+client.connect(('127.0.0.1', 8888))
+
+# Send data to server
+message = b"Hello, server!"
+sent = client.send(message)
+print("\n", client, "\n")
+
+# Check if message has been sent
+if sent == len(message):
+    print("Message sent successfully!")
+else:
+    print("Message not sent completely.")
+
+# Receive data from server
+response = client.recv(1024)
+print("\n", client, "\n")
+print("\nResponse: ", response.decode(), "\n")
+
+# Close client connection
+client.close()
+
+import socket
+
+# Set up server
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(('127.0.0.1', 8888))
+server.listen(5)
+print("\n Server : ", server, "\n" )
+
+print("Server listening on port 8888")
+
+while True:
+    # Accept connection and handle data
+    client, _ = server.accept()
+
+    print("\n Client : ", client, "\n" )
+
+    data = client.recv(1024)
+    print("Received:", data.decode())
+    client.send(data)
+    client.close()
+--------------
+2. GC client and server
+import socket
+import threading
+
+# Function to receive messages from server
+def receive_messages(client_socket):
+    while True:
+        message = client_socket.recv(1024).decode()
+        print(message)
+
+# Set up client
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(('127.0.0.1', 8888))
+
+# Start a thread to receive messages from server
+receive_thread = threading.Thread(target=receive_messages, args=(client,))
+receive_thread.start()
+
+# Main thread to send messages to server
+while True:
+    message = input()
+    client.send(message.encode())
+--
+import socket
+import threading
+
+# Function to handle each client connection
+def handle_client(client_socket, clients):
+    while True:
+        # Receive message from client
+        message = client_socket.recv(1024).decode()
+        if not message:  # If message is empty, client has disconnected
+            break
+
+        # Broadcast message to all clients
+        for client in clients:
+            if client != client_socket:  # Don't send the message back to the sender
+                client.send(message.encode())
+
+    # Remove client from list after they disconnect
+    clients.remove(client_socket)
+    client_socket.close()
+
+# Set up server
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(('127.0.0.1', 8888))
+server.listen(5)
+
+print("Server listening on port 8888")
+
+# List to store client sockets
+clients = []
+
+# Accept incoming connections and handle them in separate threads
+while True:
+    client_socket, _ = server.accept()  # Accept connection
+    clients.append(client_socket)  # Add client socket to list
+    client_handler = threading.Thread(target=handle_client, args=(client_socket, clients))  # Start thread to handle client
+    client_handler.start()
+    
+--------------
+3.DistGlobalAverage
+import threading
+
+# Take number of nodes as user input
+NUM_NODES = int(input("Enter the number of nodes: "))
+
+# Initialize local values for each node
+local_values = []
+for i in range(NUM_NODES):
+    value = int(input(f"Enter local value for node {i + 1}: "))
+    local_values.append(value)
+
+global_average = 0
+
+# Lock for synchronization
+lock = threading.Lock()
+
+# Function to compute the average of local values
+def compute_local_average():
+    with lock:
+        local_average = sum(local_values) / len(local_values)
+        print(f"Local average: {local_average}")
+        return local_average
+
+# Function to update global average using local averages
+def update_global_average():
+    global global_average
+    threshold = 1e-6  # Convergence threshold
+    while True:
+        local_average = compute_local_average()
+        with lock:
+            global_average = (global_average + local_average) / 2
+        print(f"Updated global average: {global_average}")
+        if abs(global_average - local_average) < threshold:
+            break
+
+# Start a thread to continuously update the global average
+update_thread = threading.Thread(target=update_global_average)
+update_thread.start()
+
+# Main thread waits for the update thread to finish
+update_thread.join()
+
+print(f"Final global average: {global_average}")
+----
+----------------
+# 4.Berkly
+import time
+
+# Time server node index
+TIME_SERVER_NODE = 0
+
+# Time server offset in seconds
+TIME_SERVER_OFFSET = 0
+
+# Node class representing a node in the network
+class Node:
+    def __init__(self, id, offset):
+        self.id = id
+        self.offset = offset
+        self.clock = time.time()  # Initialize the clock with the current time in seconds
+
+    # Method to adjust the clock offset of the node
+    def adjust_clock(self, offset):
+        self.clock += offset
+
+# Function to synchronize all nodes in the network
+def synchronize_clocks(nodes):
+    # Calculate the time of the time server node
+    server_time = nodes[TIME_SERVER_NODE].clock + TIME_SERVER_OFFSET
+    
+    # Adjust offset to each node
+    for node in nodes:
+        if node.id != TIME_SERVER_NODE:
+            node_time = node.clock + node.offset
+            offset = server_time - node_time
+            node.adjust_clock(offset)
+
+# Main function
+def main():
+    # Create nodes in the network
+    nodes = [
+        Node(1, 10),  # Node 1 with 10 seconds offset
+        Node(2, -5),  # Node 2 with -5 seconds offset
+        Node(3, 20)   # Node 3 with 20 seconds offset
+    ]
+
+    # Print initial clock values of all nodes
+    print("Before synchronization:")
+    for node in nodes:
+        print(f"Node {node.id} clock: {node.clock}")
+
+    # Synchronize clocks of all nodes
+    synchronize_clocks(nodes)
+
+    # Print clock values of all nodes after synchronization
+------------------------------
+# 5 Bully 
+n = int(input('Enter number of nodes : '))
+faulty = int(input(f'Enter faulty node (out of {1} to {n}) : '))
+detector = int(input('Enter node that detected failure first : '))
+
+
+def find_coordinator(detector, faulty, n):
+    for node in range(detector, n+1):
+        if node == faulty:
+            continue
+        print()
+        print(f'---- Node {node} sending ELECTION message ----')
+        oks = 0
+        for neighbor in range(node+1, n+1):
+            if neighbor != faulty:
+                oks += 1
+            print(f'ELECTION message sent to Node {neighbor}')
+
+        if oks > 0:
+            print(f'{oks} (OKs) received by Node {node}')
+        else:
+            print('Active higher priority process does NOT exist..')
+            return node
+
+
+def bully(detector, faulty, n):
+    print(f'The Coordinator (Node {faulty}) has failed...')
+    print(f'Node {detector} detected failure of coordinator...')
+    print(f'Node {detector} initiating election process...')
+
+    new_coordinator = find_coordinator(detector, faulty, n)
+
+    print()
+    print('----- RESULT OF ELECTION PROCESS-----')
+    print(f'Node {new_coordinator} elected as new coordinator !!')
+    print(
+        f'Node {new_coordinator} sending message to inform that it is elected as new coordinator...')
+    for neighbor in range(1, new_coordinator):
+        print(f'message sent to Node {neighbor}')
+
+
+bully(detector, faulty, n)
+
+'''
+About program
+The program takes three inputs: the number of nodes in the system, the node that detected the failure first, and the faulty node. Then it simulates the election process to select a new coordinator.
+
+The find_coordinator() function is responsible for sending ELECTION messages to all the nodes with a higher ID than the current node. If any of the higher nodes respond with an OK message, the current node cancels the election process and waits for the higher node to become the coordinator.
+
+If no higher node responds, the current node declares itself as the coordinator and sends a COORDINATOR message to all the lower nodes.
+
+The bully() function initiates the election process and calls the find_coordinator() function. Once the new coordinator is selected, the function prints the result and sends a message to inform all the lower nodes about the new coordinator.
+
+About code
+The program simulates the Bully Election Algorithm in a network of three nodes. The user is prompted to input the number of nodes, the index of the faulty node, and the index of the node that detects the failure first.
+
+In the given scenario, there are three nodes, and Node 2 is the faulty node that has failed. Node 1 detects the failure first and initiates the election process.
+
+Node 1 sends an election message to nodes 2 and 3, and both nodes respond with an OK message, indicating that they are still active. Since Node 3 has a higher priority than Node 2, it sends its own election message to Node 2, which does not respond since it has already failed. Thus, Node 3 declares itself as the new coordinator and sends a message to inform nodes 1 and 2 of its election.
+
+The output shows the messages sent and received during the election process, and the final result of the election, which declares Node 3 as the new coordinator.
+'''
+------------------------------
+
+# 6. Raymond 
+# no. of nodes
+n = 5
+
+request_queue = {0: [], 1: [], 2: [], 3: [], 4: []}
+holder = {0: 0, 1: 0, 2: 0, 3: 1, 4: 1}
+token = {0: 1, 1: 0, 2: 0, 3: 0, 4: 0}
+
+adj_matrix = [[1, 0, 0, 0, 0],
+              [1, 0, 0, 0, 0],
+              [1, 0, 0, 0, 0],
+              [0, 1, 0, 0, 0],
+              [0, 1, 0, 0, 0]]
+
+print("\nRaymond Tree Based Mutual Exclusion")
+print("\nAdjacency Matrix for spanning tree:\n")
+
+for i in adj_matrix:
+    print(*i)  # printing values as individual elements and not as a list
+
+# Process that wants to enter CS
+req_process = int(input("\nEnter the process who wants to enter CS: "))
+
+
+def find_parent(req_process):
+
+    # Sending the request to the root that has the token
+    request_queue[req_process].append(req_process)  # 3: [3]
+
+    for i in range(n):
+        if(adj_matrix[req_process][i] == 1):  # if req_process is pointing to the node i
+            parent = i  # node number 1 is the parent
+            # node no.1 appends node no.3(req_process) in its req_q
+            request_queue[parent].append(req_process)
+            break
+
+    print("\nProcess {} sending request to Parent Process {}".format(
+        req_process, parent))
+    print("Request queue: ", request_queue)
+
+    # checking if parent has the token or not
+    if(token[parent] == 1):
+        return parent
+    else:
+        parent = find_parent(parent)
+
+    return parent
+
+
+parent = find_parent(req_process)
+
+while(token[req_process] != 1):  # while 3 does not have token
+
+    child = request_queue[parent][0]  # 1 (child of 0)
+    request_queue[parent].pop(0)  # removing 1 from req_q list of node no.0
+
+    holder[parent] = child  # node 0 pointing to node 1
+    holder[child] = 0  # node 1 not pointing to any node
+    token[parent] = 0  # token is no longer with node 0
+    token[child] = 1  # token is with node 1
+
+    print("\nParent process {} has the token and sends the token to the request process {}".format(
+        parent, child))
+    print("Request Queue: ", request_queue)
+    parent = child
+
+if(token[parent] == 1 and request_queue[parent][0] == parent):
+    request_queue[parent].pop(0)
+    # holder variable for the node which has the token points to itself
+    holder[parent] = parent
+    print("\nProcess {} enter the Critical Section".format(parent))
+    print("Request Queue: ", request_queue)
+
+if(len(request_queue[parent]) == 0):
+    print("\nRequest Queue of process {} is empty. Therefore Release Critical Section".format(parent))
+
+print("\nHolder: ", holder)
+
+
+'''
+About 
+this program simulates the Raymond tree-based method for mutual exclusion in distributed computing. The program uses an adjacency matrix to represent the spanning tree and implements the find_parent() function to find the parent node of a process. It also maintains request queues and holder variables to keep track of which processes are requesting the token and which process is holding the token, respectively. Finally, the program implements the logic to transfer the token from the parent node to the requesting child node and to release the critical section after the process completes its task.
+
+ip/op:
+The program simulates the Raymond tree-based mutual exclusion algorithm in distributed computing. The algorithm ensures that only one process at a time can execute a critical section by maintaining a logical tree structure and a token.
+
+The input to the program is the process ID (0-4) of the process that wants to enter the critical section. The program then prints the adjacency matrix for the logical tree. The tree has a root process with ID 0 and two child processes, 1 and 2, which are connected to process 0, and two child processes, 3 and 4, which are connected to process 1.
+
+The program then finds the parent of the process that wants to enter the critical section by sending a request to the parent process until it reaches the root node, which has the token. The request is stored in the request queue of each node it passes through, and the program prints the request queue at each step.
+
+Once the process finds the parent with the token, it enters a loop where it waits for the token. The parent process sends the token to the requesting child process and updates its holder variable to point to the child. The program prints the request queue and the process that receives the token. This process then becomes the new parent and enters the loop again to wait for the token.
+
+When the process that originally requested the critical section receives the token, it enters the critical section, and the program prints a message indicating this. The request queue for this process is then emptied, and the program prints the new request queue.
+
+If the request queue for the process that holds the token is empty, it releases the critical section, and the program prints a message indicating this. The holder variable for this process is then set to point to itself.
+
+Finally, the program prints the final holder variable, which indicates which process currently holds the token.
+'''
+
+------------------------------
+# 7. Ricart 
+numProcesses = int(input("Enter number of processes: "))
+numCS = int(input("Enter Number of processes that want to enter CS: "))
+# timestamp: process
+processMap = {}
+timestamps = []
+for i in range(numCS):
+    process, timestamp = input(f"Enter the Process ID and Timestamp of process: ").split()
+    processMap[int(timestamp)] = int(process)
+    timestamps.append(int(timestamp))
+print()
+timestamps.sort()
+for time in timestamps:
+    processCS = processMap[time]
+    for i in range(numProcesses):
+        if(processCS != i):
+            print(f"Process {processCS} has requested Process {i}")
+    print()
+for time in timestamps:
+    processCS = processMap[time]
+    for i in range(numProcesses):
+        if(processCS != i):
+            print(
+                f"Process {i} has Accepted the request of process {processCS}")
+    print()
+    print(f'Process {processCS} has now entered the CS')
+    print(f'Process {processCS} has now exited the CS')
+    print()
+
+------------------------------
+8.Bankers 
+
+n = 5
+r = 3
+alloc = [[0, 1, 0], [2, 0, 0], [3, 0, 2], [2, 1, 1], [0, 0, 2]]
+mx = [[7, 5, 3], [3, 2, 2], [9, 0, 2], [2, 2, 2], [4, 3, 3]]
+need = [[7, 4, 3], [1, 2, 2], [6, 0, 0], [0, 1, 1], [4, 3, 1]]
+avail = [3, 3, 2]
+
+safe = []
+
+
+def display(mx, alloc, need, avail):
+    print('Available Resources : ', avail)
+    print('Allocated Matrix :- ')
+    print(alloc)
+    print()
+    print('Max Matrix :- ')
+    print(mx)
+    print()
+    print('Need Matrix :- ')
+    print(need)
+    print()
+
+
+def bankers(n, r, mx, alloc, need, avail):
+    print('***** Initially *****')
+    display(mx, alloc, need, avail)
+
+    while True:
+        mark = True
+
+        for i in range(n):
+            if i+1 in safe:
+                continue
+
+            mark = True
+            for j in range(r):
+                if need[i][j] > avail[j]:
+                    mark = False
+                    break
+
+            if mark:
+                safe.append(i+1)
+                for j in range(r):
+                    avail[j] += alloc[i][j] # once process done, increase jth resource availability
+                    alloc[i][j] = 0
+                    need[i][j] = '-' # ecause process is done
+
+                print(f'***** After allocating resources to P{i+1} *****')
+                print(f'P{i + 1} can be allocated resources for execution..')
+                display(mx, alloc, need, avail)
+                print()
+                break
+
+        if not mark:
+            print("System is NOT in safe state !!")
+            break
+        if len(safe) == n:
+            print("System is in safe state !!")
+            print("Safe Sequence is : ", end=" ")
+            for i in safe:
+                print(f"P{i}", end=" ")
+            print()
+            break
+
+
+bankers(n, r, mx, alloc, need, avail)
+'''
+At the beginning of the algorithm, the available resources are [3, 3, 2]. The allocated matrix shows how many resources each process is currently holding. The max matrix shows the maximum number of resources each process will need to complete its execution, and the need matrix shows the difference between the maximum resources needed and the currently allocated resources.
+
+The algorithm then attempts to allocate resources to each process in turn. First, P2 is able to allocate its needed resources and execute, leaving the available resources at [5, 3, 2]. The allocated matrix is updated to reflect the new state.
+
+Next, P4 is able to allocate its needed resources and execute, leaving the available resources at [7, 4, 3]. Again, the allocated matrix is updated.
+
+The process continues with P1 and P3 being allocated resources and executing, until finally, P5 is able to allocate its needed resources and execute. At this point, all processes have executed and the system is in a safe state without any risk of a deadlock occurring.
+
+The safe sequence is the order in which the processes executed without causing a deadlock, which is P2 P4 P1 P3 P5 in this case
+'''
+
+</pre>
+</body>
+
+</html>
