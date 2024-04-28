@@ -489,7 +489,119 @@ The process continues with P1 and P3 being allocated resources and executing, un
 
 The safe sequence is the order in which the processes executed without causing a deadlock, which is P2 P4 P1 P3 P5 in this case
 '''
+8.2
+def main():
+    processes = int(input("number of processes : "))
+    resources = int(input("number of resources : "))
+    max_resources = [int(i) for i in input("maximum resources : ").split()]
 
+    print("\n-- allocated resources for each process --")
+    currently_allocated = [[int(i) for i in input(f"process {j + 1} : ").split()] for j in range(processes)]
+
+    print("\n-- maximum resources for each process --")
+    max_need = [[int(i) for i in input(f"process {j + 1} : ").split()] for j in range(processes)]
+
+    allocated = [0] * resources
+    for i in range(processes):
+        for j in range(resources):
+            allocated[j] += currently_allocated[i][j]
+    print(f"\ntotal allocated resources : {allocated}")
+
+    available = [max_resources[i] - allocated[i] for i in range(resources)]
+    print(f"total available resources : {available}\n")
+
+    sequence=[]
+
+    running = [True] * processes
+    count = processes
+    while count != 0:
+        safe = False
+        for i in range(processes):
+            if running[i]:
+                executing = True
+                for j in range(resources):
+                    if max_need[i][j] - currently_allocated[i][j] > available[j]:
+                        executing = False
+                        break
+                if executing:
+                    print(f"process {i + 1} is executing")
+                    running[i] = False
+                    count -= 1
+                    safe = True
+                    for j in range(resources):
+                        available[j] += currently_allocated[i][j]
+                    sequence.append(i+1)
+                    break
+        if not safe:
+            print("the processes are in an unsafe state.")
+            break
+
+        print(f"the process is in a safe state.\navailable resources : {available}\n")
+    
+    print("The sequence is :")
+    s=""
+    for i in range (processes-1):
+        s+=f"P{sequence[i]} -> "
+    s+=f"P{sequence[processes-1]}"
+
+    print(s)
+
+
+if _name_ == '_main_':
+    main()
+
+    ------------------------------
+9.
+process_count = int(input("Enter the number of processes: "))
+server_count = int(input("Enter the number of servers: "))
+
+while True:
+    general_server_process_count = process_count // server_count
+    extra_process_server_count = process_count % server_count
+    general_server_count = server_count - extra_process_server_count
+    extra_process_count = general_server_process_count + 1
+
+    print("\nCurrent status of processes in distributed system:\n")
+    for i in range(extra_process_server_count):
+        print(f"Server {i+1} now handles {extra_process_count} processes")
+
+    for i in range(extra_process_server_count, server_count):
+        print(f"Server {i+1} now handles {general_server_process_count} processes")
+
+    option = int(
+        input(
+            """\nMenu -
+1. Add servers
+2. Remove servers
+3. Add processes
+4. Remove processes
+5. Exit
+\nYour choice: """
+        )
+    )
+
+    print()
+
+    if option == 1:
+        add_servers = int(input("Enter the no of servers to add: "))
+        server_count += add_servers
+    elif option == 2:
+        rem_servers = int(input("Enter the no of servers to remove: "))
+        if (server_count - rem_servers) <= 0:
+            print("The number of servers cannot be non-positive!")
+            continue
+        server_count -= rem_servers
+    elif option == 3:
+        add_processes = int(input("Enter the no of processes to add: "))
+        process_count += add_processes
+    elif option == 4:
+        rem_processes = int(input("Enter the no of processes to remove: "))
+        if (process_count - rem_processes) < 0:
+            print("The number of processes cannot be negative!")
+            continue
+        process_count -= rem_processes
+    else:
+        break
 </pre>
 </body>
 
